@@ -83,7 +83,7 @@ func main() {
 	router.HandleFunc("/verifyEmailVerificationCode", verifyCodeHandler)
 	router.HandleFunc("/resetPassword", resetForgetPasswordHandler)
 	router.Handle("/changePassword", SessionValidationMiddleware(http.HandlerFunc(changePasswordHandler)))
-
+	router.HandleFunc("/deleteUser", deleteUserHandler)
 	handler := c.Handler(router)
 
 	port := os.Getenv("PORT")
