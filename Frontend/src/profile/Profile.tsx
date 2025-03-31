@@ -16,6 +16,9 @@ const Profile = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleteError, setDeleteError] = useState<string>("");
+  const [deleteSuccess, setDeleteSuccess] = useState<string>("");
 
   const [userEmail, setUserEmail] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -52,7 +55,6 @@ const Profile = () => {
       setNewPassword("");
       setConfirmPassword("");
 
-      // Close form after 2 seconds
       setTimeout(() => setShowPasswordForm(false), 1000);
     } catch (err) {
       setError("Failed to change password. Please try again.");
@@ -156,7 +158,7 @@ const Profile = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 type="submit"
-                className="submit-btn"
+                className="password-submit-btn"
               >
                 Save Changes
               </motion.button>
@@ -177,7 +179,80 @@ const Profile = () => {
             </div>
           </motion.form>
         )}
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="delete-account-btn"
+          onClick={() => setShowDeleteConfirmation(true)}
+        >
+          Delete Account
+        </motion.button>
       </div>
+
+      {showDeleteConfirmation && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="delete-confirmation-modal"
+        >
+          <div className="delete-confirmation-content">
+            <h3>Delete Account</h3>
+            <p>
+              Are you sure you want to delete your account? All your data will
+              be permanently removed.
+            </p>
+
+            {(deleteError || deleteSuccess) && (
+              <div className="message-container">
+                {deleteError && <p className="error-message">{deleteError}</p>}
+                {deleteSuccess && (
+                  <p className="success-message">{deleteSuccess}</p>
+                )}
+              </div>
+            )}
+
+            <div className="confirmation-buttons">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="confirm-delete-btn"
+                onClick={async () => {
+                  try {
+                    await authService.deleteUser();
+                    setDeleteSuccess(
+                      "Account deleted successfully. Redirecting..."
+                    );
+                    setTimeout(() => {
+                      sessionStorage.clear();
+                      window.location.href = "/login";
+                    }, 2000);
+                  } catch (err) {
+                    setDeleteError(
+                      "Failed to delete account. Please try again."
+                    );
+                  }
+                }}
+              >
+                Delete
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="cancel-delete-btn"
+                onClick={() => {
+                  setShowDeleteConfirmation(false);
+                  setDeleteError("");
+                  setDeleteSuccess("");
+                }}
+              >
+                Cancel
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 };
