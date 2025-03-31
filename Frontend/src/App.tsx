@@ -22,9 +22,9 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              //<ProtectedRoute>
+              <ProtectedRoute>
                 <Dashboard />
-              //</ProtectedRoute>
+              </ProtectedRoute>
             }
           />
           <Route
@@ -38,9 +38,9 @@ function App() {
           <Route
             path="/listing"
             element={
-              //<ProtectedRoute>
+              <ProtectedRoute>
                 <Sell />
-              //</ProtectedRoute>
+              </ProtectedRoute>
             }
           />
         </Route>
