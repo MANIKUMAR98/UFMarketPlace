@@ -203,7 +203,7 @@ func sendVerificationCodeHandler(w http.ResponseWriter, r *http.Request) {
 	userId, _, _, _, _, err =  GetUserInfo(userId)
 
 	if err != nil {
-		http.Error(w, "Error getting user info.", http.StatusInternalServerError)
+		http.Error(w, "Error getting user info. Actual error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -343,6 +343,29 @@ func resetForgetPasswordHandler(w http.ResponseWriter, r *http.Request) {
     userId, _, _, err := GetUserByEmail(req.Email)
     if err != nil {
         http.Error(w, "User does not exist", http.StatusNotFound)
+        return
+    }
+
+	storedCode, expiresAt, err := GetVerificationCode(userId)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            http.Error(w, "No active verification code found. Resend the verification code and try again.", http.StatusBadRequest)
+            return
+        }
+        http.Error(w, fmt.Sprintf("Database error: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    // Check code expiration
+    if time.Now().After(expiresAt) {
+        _ = DeleteVerificationCode(userId) // Cleanup expired code
+        http.Error(w, "Verification code has expired", http.StatusGone)
+        return
+    }
+
+    // Verify code match
+    if storedCode != req.OTP {
+        http.Error(w, "Invalid verification code", http.StatusUnauthorized)
         return
     }
 
