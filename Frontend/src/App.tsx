@@ -2,14 +2,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Authentication from "./authentication/Authentication";
 import Dashboard from "./Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
-import Sell from "./sell/Sell";
-import EmailVerification from "./authentication/OTPVerification";
+
 import OTPVerification from "./authentication/OTPVerification";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import Profile from "./profile/Profile";
-import Layout from "./Layout";
 import ForgotPassword from "./authentication/ForgotPassword";
-// import Profile from "./profile/Profile";
+import Profile from "./profile/Profile";
+import Sell from "./sell/Sell";
 
 function App() {
   return (
