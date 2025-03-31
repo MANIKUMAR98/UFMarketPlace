@@ -229,3 +229,9 @@
     font-size: 0.9rem;
   }
 }
+
+.forgot-password{
+  text-decoration: underline;
+  color: rgb(92, 149, 220);
+  cursor: pointer;
+}

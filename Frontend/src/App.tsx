@@ -2,13 +2,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Authentication from "./authentication/Authentication";
 import Dashboard from "./Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
-import Sell from "./sell/Sell";
-import EmailVerification from "./authentication/OTPVerification";
+
 import OTPVerification from "./authentication/OTPVerification";
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import ForgotPassword from "./authentication/ForgotPassword";
 import Profile from "./profile/Profile";
-import Layout from "./Layout";
-// import Profile from "./profile/Profile";
+import Sell from "./sell/Sell";
 
 function App() {
   return (
@@ -18,32 +17,31 @@ function App() {
         <Route path="/login" element={<Authentication />} />
         <Route path="/signup" element={<Authentication />} />
         <Route path="/verify-otp" element={<OTPVerification />} />
-        <Route element={<Layout />}>
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/listing"
-            element={
-              <ProtectedRoute>
-                <Sell />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route
+          path="/listing"
+          element={
+            <ProtectedRoute>
+              <Sell />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

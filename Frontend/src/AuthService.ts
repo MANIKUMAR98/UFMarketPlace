@@ -80,7 +80,35 @@ export const authService = {
       throw this.handleError(error);
     }
   },
-
+  
+  async deleteUser () {
+    try {
+      await api.delete<AuthResponse>('/deleteUser');
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  },async changePassword(payload: AuthPayload): Promise<AuthResponse> {
+    try {
+      const response = await api.post<AuthResponse>('/changePassword', {
+        password: payload.password
+      });
+      
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }, async resetPassword(email:string, otp:string, password:string) : Promise<any> {
+    try {
+      const response = await api.post<any>('/resetPassword', {
+        email: email,
+        otp: otp,
+        password: password
+      });
+      return response.data
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  },
   async signup(payload: AuthPayload): Promise<AuthResponse> {
     try {
       if (payload.password !== payload.confirmPassword) {
@@ -91,18 +119,6 @@ export const authService = {
         email: payload.email,
         password: payload.password
       });
-      return response.data;
-    } catch (error) {
-      throw this.handleError(error);
-    }
-  },async changePassword(payload: AuthPayload): Promise<AuthResponse> {
-    try {
-      const response = await api.post<AuthResponse>('/changePassword', {
-        name: payload.name,
-        email: payload.email,
-        password: payload.password
-      });
-      
       return response.data;
     } catch (error) {
       throw this.handleError(error);
@@ -128,7 +144,6 @@ export const authService = {
           'userId': sessionStorage.getItem('userId')
         }
       };
-      console.log("Formadat " + formData.get("userId"))
 
       const response = await api.post<ProductResponse[]>('/listings', formData, config);
       return response.data;
@@ -191,7 +206,8 @@ export const authService = {
     } catch (error) {
       throw this.handleError(error);
     }
-  }, async sendEmailVerificationCode(): Promise<any> {
+  }
+  , async sendEmailVerificationCode(): Promise<any> {
     try {
       const response = await api.post<any>('/sendEmailVerificationCode', {
         email: getEmail()

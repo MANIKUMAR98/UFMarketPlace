@@ -93,6 +93,10 @@ const Authentication: React.FC = () => {
     );
   };
 
+  const onForgotPassword = () => {
+    navigate("/forgot-password");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -195,6 +199,11 @@ const Authentication: React.FC = () => {
               setFormData({ ...formData, confirmPassword: e.target.value })
             }
           />
+        )}
+        {isLogin && (
+          <div onClick={onForgotPassword} className="forgot-password">
+            Forgot password
+          </div>
         )}
 
         <button
