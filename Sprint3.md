@@ -44,6 +44,10 @@
 | #309  | Password strength     | Complexity validation                |
 | #310  | Accessibility         | Footer `aria-labels`                 |
 
+## Key Technical Additions
+
+### Reset password Flow
+
 ```mermaid
 graph TD
     A[Forgot Password] --> B{UF Email?}
