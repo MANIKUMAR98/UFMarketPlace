@@ -50,15 +50,36 @@
 
 ```mermaid
 graph TD
-    A[Forgot Password] --> B{UF Email?}
-    B -->|Valid| C[Send OTP]
-    B -->|Invalid| D[Show Error]
-    C --> E[Verify OTP]
-    E --> F{Valid?}
-    F -->|Yes| G[Reset Password]
-    F -->|No| H[Show Error]
-    G --> I[Encrypt & Store]
-    I --> J[Redirect Login]
+    A[🔐 Forgot Password] --> B{{✉️ UF Email Validation}}
+    B -->|Valid<br><b>@ufl.edu</b>| C[📤 Send OTP]
+    B -->|❌ Invalid Domain| D[⚠️ Show Error]
+    C --> E[[🔄 Verify OTP]]
+    E --> F{{✅ Valid?}}
+    F -->|✔️ Correct Code| G[🔑 Reset Password]
+    F -->|❌ Expired/Invalid| H[⚠️ Show Error]
+    G --> I[🔒 Encrypt & Store]
+    I --> J[/🏁 Redirect to Login/]
+
+    style A fill:#4a90e2,color:white
+    style B fill:#f5a623,color:white
+    style C fill:#7ed321,color:white
+    style D fill:#ff0000,color:white
+    style E fill:#9013fe,color:white
+    style F fill:#f5a623,color:white
+    style G fill:#7ed321,color:white
+    style H fill:#ff0000,color:white
+    style I fill:#417505,color:white
+    style J fill:#4a90e2,color:white
+
+    classDef process fill:#f0f4f8,stroke:#333,stroke-width:2px
+    classDef decision fill:#ffe08a,stroke:#333,stroke-width:2px
+    classDef success fill:#a3d977,stroke:#333,stroke-width:2px
+    classDef error fill:#ffb3ba,stroke:#333,stroke-width:2px
+
+    class A,J process
+    class B,F decision
+    class C,G success
+    class D,H error
 ```
 
 # Sell Component Test Documentation
