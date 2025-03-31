@@ -284,191 +284,187 @@ const Sell: React.FC = () => {
   };
 
   return (
-    <div>
-      <Header />
+    <div className="sell-container">
+      <h2 className="listings-header">My Listings</h2>
 
-      <div className="sell-container">
-        <h2 className="listings-header">My Listings</h2>
-
-        <div className="listings-grid">
-          {products.length > 0 ? (
-            products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
-          ) : (
-            <div className="empty-state">
-              <p>No listings found. Create your first one!</p>
-            </div>
-          )}
-        </div>
-
-        <button
-          className="floating-action-btn"
-          onClick={() => setIsModalOpen(true)}
-          data-testid="add-listing-btn"
-        >
-          +
-        </button>
-
-        <Modal
-          isOpen={isModalOpen}
-          onRequestClose={() => setIsModalOpen(false)}
-          style={{
-            content: {
-              top: "50%",
-              left: "50%",
-              right: "auto",
-              bottom: "auto",
-              transform: "translate(-50%, -50%)",
-              maxWidth: "600px",
-              width: "90%",
-              borderRadius: "12px",
-              padding: "2rem",
-            },
-          }}
-          overlayClassName="modal-overlay"
-          className="sell-modal-content"
-        >
-          <h2 className="listing">
-            {productData.id ? "Edit Listing" : "Create New Listing"}
-          </h2>
-          <form onSubmit={handleSubmit} className="product-form">
-            <div className="form-group">
-              <label htmlFor="Product Name">Product Name</label>
-              <input
-                id="Product Name"
-                type="text"
-                required
-                value={productData.name}
-                onChange={(e) =>
-                  setProductData({ ...productData, name: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="Description">Description</label>
-              <textarea
-                id="Description"
-                required
-                value={productData.description}
-                onChange={(e) =>
-                  setProductData({
-                    ...productData,
-                    description: e.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="price">Price ($)</label>
-              <input
-                id="price"
-                type="number"
-                required
-                step="0.01"
-                value={productData.price}
-                onChange={(e) =>
-                  setProductData({ ...productData, price: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="Category">Category</label>
-              <select
-                id="Category"
-                required
-                value={productData.category}
-                onChange={(e) =>
-                  setProductData({ ...productData, category: e.target.value })
-                }
-              >
-                <option value="">Select Category</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Books">Books</option>
-                <option value="Furniture">Furniture</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Beauty and Personal Care">
-                  Beauty and Personal Care
-                </option>
-                <option value="Sports and Fitness">Sports and Fitness</option>
-                <option value="Toys and Games">Toys and Games</option>
-                <option value="Home and Kitchen">Home and Kitchen</option>
-                <option value="Health and Wellness">Health and Wellness</option>
-                <option value="Baby Products">Baby Products</option>
-                <option value="Pet Supplies">Pet Supplies</option>
-                <option value="Food and Beverages">Food and Beverages</option>
-                <option value="Automotive">Automotive</option>
-                <option value="DIY and Hardware">DIY and Hardware</option>
-                <option value="Arts and Crafts">Arts and Crafts</option>
-                <option value="Office Supplies">Office Supplies</option>
-                <option value="Music and Instruments">
-                  Music and Instruments
-                </option>
-                <option value="Garden and Outdoor">Garden and Outdoor</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="Upload Images">Upload Images</label>
-              <input
-                id="Upload Images"
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-              />
-              <div className="image-previews">
-                {productData.images.map((img, index) => {
-                  const previewUrl =
-                    typeof img === "string" ? img : URL.createObjectURL(img);
-                  return (
-                    <div key={index} className="image-preview-container">
-                      <img
-                        src={previewUrl}
-                        alt={`Preview ${index}`}
-                        className="preview-image"
-                      />
-                      <button
-                        type="button"
-                        className="remove-image-btn"
-                        onClick={() => removeImage(index)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="form-actions">
-              <button
-                type="button"
-                className="cancel-btn"
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setProductData({
-                    id: "",
-                    name: "",
-                    description: "",
-                    price: "",
-                    category: "",
-                    images: [],
-                  });
-                }}
-              >
-                Cancel
-              </button>
-              <button type="submit" className="submit-btn">
-                {productData.id ? "Save Changes" : "List Item"}
-              </button>
-            </div>
-          </form>
-        </Modal>
+      <div className="listings-grid">
+        {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))
+        ) : (
+          <div className="empty-state">
+            <p>No listings found. Create your first one!</p>
+          </div>
+        )}
       </div>
+
+      <button
+        className="floating-action-btn"
+        onClick={() => setIsModalOpen(true)}
+        data-testid="add-listing-btn"
+      >
+        +
+      </button>
+
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        style={{
+          content: {
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            transform: "translate(-50%, -50%)",
+            maxWidth: "600px",
+            width: "90%",
+            borderRadius: "12px",
+            padding: "2rem",
+          },
+        }}
+        overlayClassName="modal-overlay"
+        className="sell-modal-content"
+      >
+        <h2 className="listing">
+          {productData.id ? "Edit Listing" : "Create New Listing"}
+        </h2>
+        <form onSubmit={handleSubmit} className="product-form">
+          <div className="form-group">
+            <label htmlFor="Product Name">Product Name</label>
+            <input
+              id="Product Name"
+              type="text"
+              required
+              value={productData.name}
+              onChange={(e) =>
+                setProductData({ ...productData, name: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="Description">Description</label>
+            <textarea
+              id="Description"
+              required
+              value={productData.description}
+              onChange={(e) =>
+                setProductData({
+                  ...productData,
+                  description: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="price">Price ($)</label>
+            <input
+              id="price"
+              type="number"
+              required
+              step="0.01"
+              value={productData.price}
+              onChange={(e) =>
+                setProductData({ ...productData, price: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="Category">Category</label>
+            <select
+              id="Category"
+              required
+              value={productData.category}
+              onChange={(e) =>
+                setProductData({ ...productData, category: e.target.value })
+              }
+            >
+              <option value="">Select Category</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Books">Books</option>
+              <option value="Furniture">Furniture</option>
+              <option value="Clothing">Clothing</option>
+              <option value="Beauty and Personal Care">
+                Beauty and Personal Care
+              </option>
+              <option value="Sports and Fitness">Sports and Fitness</option>
+              <option value="Toys and Games">Toys and Games</option>
+              <option value="Home and Kitchen">Home and Kitchen</option>
+              <option value="Health and Wellness">Health and Wellness</option>
+              <option value="Baby Products">Baby Products</option>
+              <option value="Pet Supplies">Pet Supplies</option>
+              <option value="Food and Beverages">Food and Beverages</option>
+              <option value="Automotive">Automotive</option>
+              <option value="DIY and Hardware">DIY and Hardware</option>
+              <option value="Arts and Crafts">Arts and Crafts</option>
+              <option value="Office Supplies">Office Supplies</option>
+              <option value="Music and Instruments">
+                Music and Instruments
+              </option>
+              <option value="Garden and Outdoor">Garden and Outdoor</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="Upload Images">Upload Images</label>
+            <input
+              id="Upload Images"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+            />
+            <div className="image-previews">
+              {productData.images.map((img, index) => {
+                const previewUrl =
+                  typeof img === "string" ? img : URL.createObjectURL(img);
+                return (
+                  <div key={index} className="image-preview-container">
+                    <img
+                      src={previewUrl}
+                      alt={`Preview ${index}`}
+                      className="preview-image"
+                    />
+                    <button
+                      type="button"
+                      className="remove-image-btn"
+                      onClick={() => removeImage(index)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button
+              type="button"
+              className="cancel-btn"
+              onClick={() => {
+                setIsModalOpen(false);
+                setProductData({
+                  id: "",
+                  name: "",
+                  description: "",
+                  price: "",
+                  category: "",
+                  images: [],
+                });
+              }}
+            >
+              Cancel
+            </button>
+            <button type="submit" className="submit-btn">
+              {productData.id ? "Save Changes" : "List Item"}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from "react";
+import { useState, useEffect, FC, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import "./Header.css";
@@ -7,15 +7,29 @@ import { useNavigate } from "react-router-dom";
 const Header: FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [userEmail, setUserEmail] = useState<string>("");
-
   const [name, setName] = useState<string>("");
   const navigate = useNavigate();
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const email = sessionStorage.getItem("email") || "mani@gmail.com";
     const userName = sessionStorage.getItem("name") || "";
     setUserEmail(email);
     setName(userName);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const handleLogout = (): void => {
@@ -27,7 +41,7 @@ const Header: FC = () => {
     navigate("/listing");
   };
 
-  const handleProfile = () => {
+  const handleProfile = (): void => {
     navigate("/profile");
   };
 
@@ -52,7 +66,7 @@ const Header: FC = () => {
           >
             Sell
           </button>
-          <div className="user-section">
+          <div className="user-section" ref={menuRef}>
             <button
               className="user-icon-btn"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -68,8 +82,7 @@ const Header: FC = () => {
                 <p className="user-name">{name}</p>
                 <p className="user-email">{userEmail}</p>
                 <p className="profile" onClick={handleProfile}>
-                  {" "}
-                  {"View & Update profile information"}
+                  View & Update profile information
                 </p>
               </div>
               <button className="logout-btn" onClick={handleLogout}>
