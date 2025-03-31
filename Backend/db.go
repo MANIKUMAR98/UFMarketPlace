@@ -153,22 +153,24 @@ func initListingsDB() error {
 }
 
 
-func ValidateSession(sessionID string) (bool, error) {
+func ValidateSession(sessionID string, userID int) (bool, error) {
     var retrievedSessionID string
-    currentTime := time.Now().Unix()
+    currentTime := time.Now()
 
     // Query to check session validity
     err := db.QueryRow(
         `SELECT session_id FROM sessions 
-        WHERE session_id = $1 
-        AND expires_at > $2`,
+        WHERE session_id = $1 and user_id = $2
+        AND expires_at > $3`,
         sessionID,
+		userID,
         currentTime,
+
     ).Scan(&retrievedSessionID)
 
     switch {
     case err == sql.ErrNoRows:
-        return false, nil
+        return false, fmt.Errorf("no Valid Session Found")
     case err != nil:
         return false, fmt.Errorf("database error: %w", err)
     default:
@@ -225,5 +227,21 @@ func DeleteExpiredVerificationCodes() error {
         `DELETE FROM verification_codes WHERE expires_at < $1`,
         time.Now().Unix(),
     )
+    return err
+}
+
+
+// Sprint3 reset password
+
+var UpdateUserPassword = func(userId int, hashedPassword string) error {
+
+	query := "UPDATE users SET password = $1 WHERE id = $2"
+	_, err := db.Exec(query, string(hashedPassword), userId)
+	return err
+}
+
+var DeleteAllSessions = func(userId int) error {
+    query := "DELETE FROM sessions WHERE user_id = $1"
+    _, err := db.Exec(query, userId)
     return err
 }

@@ -4,9 +4,11 @@ import (
 	"UFMarketPlace/utils"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	_ "github.com/lib/pq" // PostgreSQL driver
 	"github.com/rs/cors"
@@ -14,20 +16,17 @@ import (
 
 var db *sql.DB
 
-
 type Config struct {
-    SMTP struct {
-        Host     string `json:"host"`
-        Port     int    `json:"port"`
-        Username string `json:"username"`
-        Password string `json:"password"`
-		Sender  string `json:"sender"`
-    } `json:"smtp"`
+	SMTP struct {
+		Host     string `json:"host"`
+		Port     int    `json:"port"`
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Sender   string `json:"sender"`
+	} `json:"smtp"`
 }
 
 var appConfig Config
-
-
 
 func main() {
 	var err error
@@ -40,6 +39,7 @@ func main() {
 		Password: appConfig.SMTP.Password,
 		Sender:   appConfig.SMTP.Sender,
 	})
+
 	// Set up CORS middleware.
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:*"}, // For Frontend
@@ -75,13 +75,14 @@ func main() {
 	router := http.NewServeMux()
 	router.HandleFunc("/signup", signupHandler)
 	router.HandleFunc("/login", loginHandler)
-	router.HandleFunc("/listings", listingsHandler)              // GET (all listings except current user) & POST (create new listing)
-	router.HandleFunc("/listings/user", userListingsHandler)       // GET (listings for current user)
-	router.HandleFunc("/listing/updateListing", editListingHandler)   // PUT (edit listing)
-	router.HandleFunc("/listing/deleteListing", deleteListingHandler) // DELETE (delete listing)
+	router.Handle("/listings", SessionValidationMiddleware(http.HandlerFunc(listingsHandler)) )             // GET (all listings except current user) & POST (create new listing)
+	router.Handle("/listings/user", SessionValidationMiddleware(http.HandlerFunc(userListingsHandler) ) )     // GET (listings for current user)
+	router.Handle("/listing/updateListing", SessionValidationMiddleware(http.HandlerFunc(editListingHandler)))   // PUT (edit listing)
+	router.Handle("/listing/deleteListing", SessionValidationMiddleware(http.HandlerFunc(deleteListingHandler))) // DELETE (delete listing)
 	router.HandleFunc("/sendEmailVerificationCode", sendVerificationCodeHandler)
 	router.HandleFunc("/verifyEmailVerificationCode", verifyCodeHandler)
-	// router.HandleFunc("/image", imageHandler)                  // GET (serve image)
+	router.HandleFunc("/resetPassword", resetForgetPasswordHandler)
+	router.Handle("/changePassword", SessionValidationMiddleware(http.HandlerFunc(changePasswordHandler)))
 
 	handler := c.Handler(router)
 
@@ -92,8 +93,6 @@ func main() {
 	log.Printf("Server running on :%s", port)
 	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
-
-
 
 func loadConfig(path string) {
 	file, err := os.Open(path)
@@ -106,3 +105,84 @@ func loadConfig(path string) {
 		log.Fatalf("Invalid config: %v", err)
 	}
 }
+
+type RequestBody struct {
+	UserID int    `json:"user_id"`
+	Email  string `json:"email"`
+}
+
+func SessionValidationMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Step 1: Validate session-id (you can implement your actual session validation logic)
+		sessionID := r.Header.Get("X-Session-ID")
+		if sessionID == "" {
+			http.Error(w, "Session-ID missing", http.StatusUnauthorized)
+			return
+		}
+
+		// Step 2: Get userId from request body or by querying database using email
+		currentUserIDStr := r.Header.Get("userId")
+		userID, err := strconv.Atoi(currentUserIDStr)
+		if err != nil {
+			http.Error(w, "Invalid userId header", http.StatusBadRequest)
+			return
+		}
+
+		fmt.Print(sessionID)
+		// Step 3: Validate session for the user
+		_, err = ValidateSession(sessionID, userID)
+
+		if err != nil {
+			// Session validation failed
+			http.Error(w, fmt.Sprintf("Invalid session: %v", err), http.StatusUnauthorized)
+			return
+		}
+
+		// If everything is good, proceed to the next handler
+		next.ServeHTTP(w, r)
+	})
+}
+
+func GetUserIDFromRequestBody(r *http.Request) (int, error) {
+	var reqBody RequestBody
+
+	// Decode the request body into RequestBody struct
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&reqBody)
+	if err != nil {
+		return 0, fmt.Errorf("could not decode request body: %v", err)
+	}
+
+	// Step 1: Check if userId is present in request body
+	if reqBody.UserID != 0 {
+		return reqBody.UserID, nil
+	}
+
+	// Step 2: If userId is not present, check for email and get userId from database
+	if reqBody.Email != "" {
+		userID, _, _, err := GetUserByEmail(reqBody.Email)
+		if err != nil {
+			return 0, err
+		}
+		return userID, nil
+	}
+
+	// Step 3: If neither userId nor email is present, return an error
+	return 0, fmt.Errorf("either userId or email must be provided")
+}
+
+// // Example function to get userId by email (query the database)
+// func GetUserByEmail(email string) (int, string, string, error) {
+// 	var userID int
+// 	var name, emailFromDB string
+
+// 	query := `SELECT user_id, name, email FROM users WHERE email = $1`
+// 	err := db.QueryRow(query, email).Scan(&userID, &name, &emailFromDB)
+// 	if err != nil {
+// 		if err == sql.ErrNoRows {
+// 			return 0, "", "", fmt.Errorf("no user found with email %s", email)
+// 		}
+// 		return 0, "", "", err
+// 	}
+// 	return userID, name, emailFromDB, nil
+// }

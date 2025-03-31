@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -25,6 +26,19 @@ type SignUpCredentials struct {
 	Name     string `json:"name"`
 	Password string `json:"password"`
 }
+
+type resetForgotPassword struct{
+	Email string `json:"email"`
+	OTP string `json:"otp"`
+	Password string `json:"password"`
+}
+
+type changePassword struct{
+	Password string `json:"password"`
+
+
+}
+
 
 
 type VerificationRequest struct {
@@ -186,17 +200,13 @@ func sendVerificationCodeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId, _, _, _, verificationStatus, err :=  GetUserInfo(userId)
+	userId, _, _, _, _, err =  GetUserInfo(userId)
 
 	if err != nil {
 		http.Error(w, "Error getting user info.", http.StatusInternalServerError)
 		return
 	}
 
-	if verificationStatus == 1 {
-		http.Error(w, "Account is already verified", http.StatusBadRequest)
-		return
-	}
 	// Step 6: Store the new verification code in the database
 	err = StoreVerificationCode(userId, req.Email, code)
 	if err != nil {
@@ -310,5 +320,126 @@ func verifyCodeHandler(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(map[string]interface{}{
         "message": fmt.Sprintf("Email %s successfully verified", req.Email),
 		"userId": userId,
+    })
+}
+
+func resetForgetPasswordHandler(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+        http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+        return
+    }
+
+    var req resetForgotPassword
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        http.Error(w, "Invalid request payload", http.StatusBadRequest)
+        return
+    }
+
+    if req.Email == "" || req.OTP == "" || req.Password == "" {
+        http.Error(w, "Email, OPT, and new password are required", http.StatusBadRequest)
+        return
+    }
+
+    userId, _, _, err := GetUserByEmail(req.Email)
+    if err != nil {
+        http.Error(w, "User does not exist", http.StatusNotFound)
+        return
+    }
+
+
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+    if err != nil {
+        http.Error(w, "Error hashing password", http.StatusInternalServerError)
+        return
+    }
+
+    err = UpdateUserPassword(userId, string(hashedPassword))
+    if err != nil {
+        http.Error(w, "Error updating password", http.StatusInternalServerError)
+        return
+    }
+
+    err = DeleteAllSessions(userId)
+    if err != nil {
+        http.Error(w, "Error deleting old sessions", http.StatusInternalServerError)
+        return
+    }
+
+    newSessionId, err := CreateSession(userId)
+    if err != nil {
+        http.Error(w, "Error creating new session", http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]interface{}{
+        "message": "Password reset successfully. All session logged Out.",
+        "sessionId": newSessionId,
+        "userId": userId,
+    })
+}
+
+
+func changePasswordHandler(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+        http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+        return
+    }
+	fmt.Print(("Here"))
+
+    var req changePassword
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        http.Error(w, "Invalid request payload", http.StatusBadRequest)
+        return
+    }
+
+    // Validate that UserID and Password are provided
+    if req.Password == "" {
+        http.Error(w, "UserId and new password are required", http.StatusBadRequest)
+        return
+    }
+
+    // Get user info based on UserID
+	currentUserIDStr := r.Header.Get("userId")
+	userId, err := strconv.Atoi(currentUserIDStr)
+	if err != nil {
+		http.Error(w, "Invalid userId header", http.StatusBadRequest)
+		return
+	}
+
+    // Hash the new password
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+    if err != nil {
+        http.Error(w, "Error hashing password", http.StatusInternalServerError)
+        return
+    }
+
+    // Update the user's password
+    err = UpdateUserPassword(userId, string(hashedPassword))
+    if err != nil {
+        http.Error(w, "Error updating password", http.StatusInternalServerError)
+        return
+    }
+
+    // Delete all active sessions for the user
+    err = DeleteAllSessions(userId)
+    if err != nil {
+        http.Error(w, "Error deleting old sessions", http.StatusInternalServerError)
+        return
+    }
+
+    // Create a new session after password change
+    newSessionId, err := CreateSession(userId)
+    if err != nil {
+        http.Error(w, "Error creating new session", http.StatusInternalServerError)
+        return
+    }
+
+    // Send the response with the new session ID
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]interface{}{
+        "message":   "Password reset successfully. All sessions logged out.",
+        "sessionId": newSessionId,
+        "userId":    userId,
     })
 }
