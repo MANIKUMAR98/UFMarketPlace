@@ -365,17 +365,9 @@ func resetForgetPasswordHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    newSessionId, err := CreateSession(userId)
-    if err != nil {
-        http.Error(w, "Error creating new session", http.StatusInternalServerError)
-        return
-    }
-
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(map[string]interface{}{
-        "message": "Password reset successfully. All session logged Out.",
-        "sessionId": newSessionId,
-        "userId": userId,
+        "message": "Password reset successfully. All active session logged Out.",
     })
 }
 
