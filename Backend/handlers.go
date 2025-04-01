@@ -8,9 +8,8 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
-
+	"strconv"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -49,6 +48,33 @@ type VerifyCodeRequest struct {
     Email string `json:"email"`
     Code      string `json:"code"`
 }
+
+
+func deleteUserHandler(w http.ResponseWriter, r *http.Request) {
+	userIdStr := r.Header.Get("userId")
+	if userIdStr == "" {
+		http.Error(w, "Missing userId header", http.StatusBadRequest)
+		return
+	}
+
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		http.Error(w, "Invalid userId header", http.StatusBadRequest)
+		return
+	}
+	
+	_, err = db.Query("DELETE FROM users WHERE id = $1", userId)
+	if err != nil {
+		http.Error(w, "Failed to delete user", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"message": "User deleted successfully",
+	})
+}
+
 
 // signupHandler handles user registration.
 func signupHandler(w http.ResponseWriter, r *http.Request) {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -115,5 +116,31 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		"name":      name,
 		"email":     creds.Email,
 		"userId":    userID,
+	})
+}
+
+
+func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
+	userIdStr := r.Header.Get("userId")
+	if userIdStr == "" {
+		http.Error(w, "Missing userId header", http.StatusBadRequest)
+		return
+	}
+
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		http.Error(w, "Invalid userId header", http.StatusBadRequest)
+		return
+	}
+	
+	_, err = DB.Query("DELETE FROM users WHERE id = $1", userId)
+	if err != nil {
+		http.Error(w, "Failed to delete user", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"message": "User deleted successfully",
 	})
 }

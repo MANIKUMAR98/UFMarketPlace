@@ -8,6 +8,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import ForgotPassword from "./authentication/ForgotPassword";
 import Profile from "./profile/Profile";
 import Sell from "./sell/Sell";
+import Layout from "./Layout";
 
 function App() {
   return (
@@ -17,31 +18,33 @@ function App() {
         <Route path="/login" element={<Authentication />} />
         <Route path="/signup" element={<Authentication />} />
         <Route path="/verify-otp" element={<OTPVerification />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route
-          path="/listing"
-          element={
-            <ProtectedRoute>
+        <Route element={<Layout />}>
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+              <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+              <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/listing"
+            element={
+              <ProtectedRoute>
               <Sell />
-            </ProtectedRoute>
-          }
-        />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
       </Routes>
     </Router>
   );

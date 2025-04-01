@@ -234,4 +234,5 @@
   text-decoration: underline;
   color: rgb(92, 149, 220);
   cursor: pointer;
+  width: fit-content;
 }
