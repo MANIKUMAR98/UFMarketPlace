@@ -391,6 +391,17 @@ This document outlines the unit tests for the `Profile` component, ensuring that
   - Click "Cancel."
   - Verify that the password change form is no longer displayed.
 
+### 8. **Deleting User ID**
+
+- **Purpose**: Ensures that the user ID deletion functionality works as expected and handles errors gracefully.
+- **Test Steps**:
+  - Render the `Profile` component.
+  - Simulate a click on the "Delete Account" button.
+  - Confirm the deletion action in the modal dialog.
+  - Verify that the `authService.deleteUser` function is called with the correct user ID.
+  - Check for a success message if the deletion is successful.
+  - Verify that the user is redirected to the login page after account deletion.
+
 ## Test Utilities
 
 - **`render`**: Renders the component in a simulated environment.
@@ -406,6 +417,8 @@ This document outlines the unit tests for the `Profile` component, ensuring that
 - The password change form should appear when requested and validate user input.
 - Errors should be displayed when passwords mismatch or an API failure occurs.
 - The form should close automatically after a successful password change.
+- The user ID deletion functionality should work as expected, providing confirmation prompts and handling errors gracefully.
+
 
 ## Edge Cases Considered
 
