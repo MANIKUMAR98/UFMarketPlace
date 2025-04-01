@@ -835,6 +835,78 @@ Deletes an existing listing along with all its images (only if owned by the curr
 | 401         | Unauthorized          | "Unauthorized"                               |
 | 500         | Internal Server Error | "error message"                              |
 
+## **Reset Password**
+
+Resets the password using a verification code sent to the user's email.
+
+### **Endpoint**
+
+`POST /resetPassword`
+
+### **Request Body (JSON)**
+
+````json
+{
+  "email": "user@example.com",
+  "OTP": "123456",
+  "password": "newsecurepassword123"
+}
+
+### **Success Response (JSON)**
+
+```json
+{
+  "message": "Password reset successfully. All active sessions logged out."
+}
+
+````
+
+### **Response Errors**
+
+| Status Code | Error Type            | Example Response Body                       |
+| ----------- | --------------------- | ------------------------------------------- |
+| 400         | Invalid Request       | "Email, OTP, and new password are required" |
+| 400         | Invalid OTP           | "Invalid verification code"                 |
+| 401         | Unauthorized          | "Unauthorized"                              |
+| 500         | Internal Server Error | "Database error: Failed to reset password"  |
+
+## **Change Password**
+
+Changes the password for the authenticated user.
+
+### **Endpoint**
+
+`POST /changePassword`
+
+### **Request Body (JSON)**
+
+````json
+{
+  "password": "newsecurepassword123"
+}
+
+
+### **Success Response (JSON)**
+
+```json
+{
+  "message": "Password changed successfully. All sessions logged out.",
+  "sessionId": "abc123",
+  "userId": "123"
+}
+
+### **Response Errors**
+
+| Status Code | Error Type            | Example Response Body                   |
+| ----------- | --------------------- | --------------------------------------- |
+| 400         | Invalid Request       | "Email, OTP, and new password are required" |
+| 400         | Invalid OTP           | "Invalid verification code"             |
+| 401         | Unauthorized          | "Unauthorized"                          |
+| 500         | Internal Server Error | "Database error: Failed to reset password" |
+
+
+
 ```
 
 ```
+````
