@@ -905,7 +905,7 @@ Changes the password for the authenticated user.
 
 ### **Request Body (JSON)**
 
-````json
+```json
 {
   "password": "newsecurepassword123"
 }
@@ -920,52 +920,18 @@ Changes the password for the authenticated user.
   "userId": "123"
 }
 ```
+
 ### **Response Errors**
 
-| Status Code | Error Type            | Example Response Body                   |
-| ----------- | --------------------- | --------------------------------------- |
+| Status Code | Error Type            | Example Response Body                       |
+| ----------- | --------------------- | ------------------------------------------- |
 | 400         | Invalid Request       | "Email, OTP, and new password are required" |
-| 400         | Invalid OTP           | "Invalid verification code"             |
-| 401         | Unauthorized          | "Unauthorized"                          |
-| 500         | Internal Server Error | "Database error: Failed to reset password" |
-
-
-## **Delete User**
-
-Deletes an existing user based on the `userId` provided in the request header.
-
-### **Endpoint**
-
-`DELETE /user/deleteUser`
-
-### **Request Headers**
-
-- `userId` (required): The ID of the user to be deleted.
-
-### **Request Body**
-
-- None
-
-### **Success Response (JSON)**
-
-```json
-{
-  "message": "User deleted successfully"
-}
-
-### **Response Errors**
-
-| Status Code | Error Type            | Example Response Body                        |
-| ----------- | --------------------- | -------------------------------------------- |
-| 400         | Invalid Request       | "Invalid sessionId", "Missing required fields" |
-| 401         | Unauthorized          | "Session expired", "Invalid credentials"     |
-| 404         | Not Found             | "Resource not found"                         |
-| 500         | Internal Server Error | "Unexpected server error"                    |
-```
-
-
+| 400         | Invalid OTP           | "Invalid verification code"                 |
+| 401         | Unauthorized          | "Unauthorized"                              |
+| 500         | Internal Server Error | "Database error: Failed to reset password"  |
 
 ```
-````
+
 
 ---
+```
