@@ -10,6 +10,9 @@
 - Implemented session persistence for profile updates
 - Added comprehensive test coverage (85%) for auth flows
 - Enhanced image rendering consistency across components
+- Added support for forget password with OTP verifcation
+- Added support for change password
+- Added middleware to validate if a request has validate sessionId for user
 
 ## User Stories (Frontend)
 
@@ -402,6 +405,58 @@ This document outlines the unit tests for the `Profile` component, ensuring that
   - Check for a success message if the deletion is successful.
   - Verify that the user is redirected to the login page after account deletion.
 
+### 9. **SessionValidationMiddleware**
+
+**Purpose**: Ensures all request have valid sessionId.
+
+- **Test Case 1**: Successful session validation
+
+  - **Input**: Valid session headers.
+  - **Expected Output**: HTTP 200 OK with `"success"`.
+  - **Mock**: `Validate(sessionID, userID) → true, nil`.
+
+- **Test Case 2**: Missing session ID
+
+  - **Input**: Request missing `X-Session-ID` header.
+  - **Expected Output**: HTTP 401 Unauthorized with `{"error": "Session-ID missing"}`.
+
+- **Test Case 3**: Invalid user ID
+
+  - **Input**: Request with non-numeric `userId`.
+  - **Expected Output**: HTTP 400 Bad Request with `{"error": "Invalid userId header"}`.
+
+- **Test Case 4**: Invalid session
+
+  - **Input**: Valid `X-Session-ID`, but validation fails.
+  - **Expected Output**: HTTP 401 Unauthorized with `{"error": "Invalid session"}`.
+  - **Mock**: `Validate(sessionID, userID) → false, "session expired"`.
+
+- **Test Case 5**: Valid session with request body
+  - **Input**: Valid session with request body.
+  - **Expected Output**: HTTP 200 OK with `"success"`.
+  - **Mock**: `Validate(sessionID, userID) → true, nil`.
+
+### **Password Reset Handlers**
+
+- **Test Case 1**: Successful password reset via forgotten password
+
+  - **Input**: Valid email, correct OTP, new password.
+  - **Expected Output**: HTTP 200 OK with `{"message": "Password reset successfully. All active sessions logged out."}`.
+  - **Mock**: `GetUserByEmail → valid user`, `GetVerificationCode → correct OTP`, `UpdateUserPassword → success`, `DeleteAllSessions → success`, `CreateSession → new session ID`.
+
+- **Test Case 2**: Successful password change
+
+  - **Input**: Authenticated user, new password.
+  - **Expected Output**: HTTP 200 OK with `{"message": "Password reset successfully. All sessions logged out.", "sessionId": "newsession123", "userId": 123}`.
+  - **Mock**: `UpdateUserPassword → success`, `DeleteAllSessions → success`, `CreateSession → new session ID`.
+
+- **Test Case 3**: Invalid OTP for forgotten password reset
+  - **Input**: Valid email, incorrect OTP, new password.
+  - **Expected Output**: HTTP 401 Unauthorized with `{"error": "Invalid OTP"}`.
+  - **Mock**: `GetVerificationCode → incorrect OTP`.
+
+---
+
 ## Test Utilities
 
 - **`render`**: Renders the component in a simulated environment.
@@ -418,7 +473,6 @@ This document outlines the unit tests for the `Profile` component, ensuring that
 - Errors should be displayed when passwords mismatch or an API failure occurs.
 - The form should close automatically after a successful password change.
 - The user ID deletion functionality should work as expected, providing confirmation prompts and handling errors gracefully.
-
 
 ## Edge Cases Considered
 
