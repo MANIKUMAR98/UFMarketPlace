@@ -153,7 +153,7 @@ func initListingsDB() error {
 }
 
 
-func ValidateSession(sessionID string, userID int) (bool, error) {
+var ValidateSession = func(sessionID string, userID int) (bool, error) {
     var retrievedSessionID string
     currentTime := time.Now()
 

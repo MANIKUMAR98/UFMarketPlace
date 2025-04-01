@@ -400,7 +400,6 @@ func changePasswordHandler(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
         return
     }
-	fmt.Print(("Here"))
 
     var req changePassword
     if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -434,6 +433,10 @@ func changePasswordHandler(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         http.Error(w, "Error updating password", http.StatusInternalServerError)
         return
+    }
+
+	if err := DeleteVerificationCode(userId); err != nil {
+        log.Printf("Warning: Failed to delete verification code for user %d: %v", userId, err)
     }
 
     // Delete all active sessions for the user
