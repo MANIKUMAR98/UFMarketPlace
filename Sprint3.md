@@ -493,6 +493,29 @@ This document lists the unit tests(added for Sprint3) for the backend of the app
   - **Expected Output**: HTTP 401 Unauthorized with `{"error": "Invalid OTP"}`.
   - **Mock**: `GetVerificationCode → incorrect OTP`.
 
+
+### 4. **DeleteUserHandler**
+
+- **Test Case 1**: Successful User Deletion  
+  - **Input**: HTTP DELETE request with header `userId=1`  
+  - **Expected Output**: HTTP 200 OK with JSON body `{"message":"User deleted successfully"}`  
+  - **Mock**: Database mock expects a DELETE query for the user with ID `1` and simulates successful deletion.
+
+- **Test Case 2**: Database Error  
+  - **Input**: HTTP DELETE request with header `userId=1`  
+  - **Expected Output**: HTTP 500 Internal Server Error with body `"Failed to delete user"`  
+  - **Mock**: Database mock returns an error (e.g., `sql.ErrConnDone`) when executing the DELETE query.
+
+- **Test Case 3**: Missing User ID Header  
+  - **Input**: HTTP DELETE request without the `userId` header  
+  - **Expected Output**: HTTP 400 Bad Request with body `"Missing userId header"`  
+  - **Mock**: Handler detects the missing header and returns early without interacting with the database.
+
+- **Test Case 4**: Invalid User ID  
+  - **Input**: HTTP DELETE request with header `userId=invalid`  
+  - **Expected Output**: HTTP 400 Bad Request with body `"Invalid userId header"`  
+  - **Mock**: Handler fails to convert the non-numeric `userId` and returns an error immediately without any database operation.
+
 ---
 
 # **UFMarketPlace API Documentation**
@@ -838,3 +861,37 @@ Deletes an existing listing along with all its images (only if owned by the curr
 ```
 
 ```
+
+---
+
+## **Delete User**
+
+Deletes an existing user based on the `userId` provided in the request header.
+
+### **Endpoint**
+
+`DELETE /user/deleteUser`
+
+### **Request Headers**
+
+- `userId` (required): The ID of the user to be deleted.
+
+### **Request Body**
+
+- None
+
+### **Success Response (JSON)**
+
+```json
+{
+  "message": "User deleted successfully"
+}
+
+### **Response Errors**
+
+| Status Code | Error Type            | Example Response Body                        |
+| ----------- | --------------------- | -------------------------------------------- |
+| 400         | Invalid Request       | "Invalid sessionId", "Missing required fields" |
+| 401         | Unauthorized          | "Session expired", "Invalid credentials"     |
+| 404         | Not Found             | "Resource not found"                         |
+| 500         | Internal Server Error | "Unexpected server error"                    |
