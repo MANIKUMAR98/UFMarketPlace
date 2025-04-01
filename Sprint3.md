@@ -932,6 +932,4 @@ Changes the password for the authenticated user.
 
 ```
 
-
----
 ```
