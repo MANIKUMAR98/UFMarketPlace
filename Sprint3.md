@@ -394,67 +394,6 @@ This document outlines the unit tests for the `Profile` component, ensuring that
   - Click "Cancel."
   - Verify that the password change form is no longer displayed.
 
-### 8. **Deleting User ID**
-
-- **Purpose**: Ensures that the user ID deletion functionality works as expected and handles errors gracefully.
-- **Test Steps**:
-  - Render the `Profile` component.
-  - Simulate a click on the "Delete Account" button.
-  - Confirm the deletion action in the modal dialog.
-  - Verify that the `authService.deleteUser` function is called with the correct user ID.
-  - Check for a success message if the deletion is successful.
-  - Verify that the user is redirected to the login page after account deletion.
-
-### 9. **SessionValidationMiddleware**
-
-**Purpose**: Ensures all request have valid sessionId.
-
-- **Test Case 1**: Successful session validation
-
-  - **Input**: Valid session headers.
-  - **Expected Output**: HTTP 200 OK with `"success"`.
-  - **Mock**: `Validate(sessionID, userID) → true, nil`.
-
-- **Test Case 2**: Missing session ID
-
-  - **Input**: Request missing `X-Session-ID` header.
-  - **Expected Output**: HTTP 401 Unauthorized with `{"error": "Session-ID missing"}`.
-
-- **Test Case 3**: Invalid user ID
-
-  - **Input**: Request with non-numeric `userId`.
-  - **Expected Output**: HTTP 400 Bad Request with `{"error": "Invalid userId header"}`.
-
-- **Test Case 4**: Invalid session
-
-  - **Input**: Valid `X-Session-ID`, but validation fails.
-  - **Expected Output**: HTTP 401 Unauthorized with `{"error": "Invalid session"}`.
-  - **Mock**: `Validate(sessionID, userID) → false, "session expired"`.
-
-- **Test Case 5**: Valid session with request body
-  - **Input**: Valid session with request body.
-  - **Expected Output**: HTTP 200 OK with `"success"`.
-  - **Mock**: `Validate(sessionID, userID) → true, nil`.
-
-### **Password Reset Handlers**
-
-- **Test Case 1**: Successful password reset via forgotten password
-
-  - **Input**: Valid email, correct OTP, new password.
-  - **Expected Output**: HTTP 200 OK with `{"message": "Password reset successfully. All active sessions logged out."}`.
-  - **Mock**: `GetUserByEmail → valid user`, `GetVerificationCode → correct OTP`, `UpdateUserPassword → success`, `DeleteAllSessions → success`, `CreateSession → new session ID`.
-
-- **Test Case 2**: Successful password change
-
-  - **Input**: Authenticated user, new password.
-  - **Expected Output**: HTTP 200 OK with `{"message": "Password reset successfully. All sessions logged out.", "sessionId": "newsession123", "userId": 123}`.
-  - **Mock**: `UpdateUserPassword → success`, `DeleteAllSessions → success`, `CreateSession → new session ID`.
-
-- **Test Case 3**: Invalid OTP for forgotten password reset
-  - **Input**: Valid email, incorrect OTP, new password.
-  - **Expected Output**: HTTP 401 Unauthorized with `{"error": "Invalid OTP"}`.
-  - **Mock**: `GetVerificationCode → incorrect OTP`.
-
 ---
 
 ## Test Utilities
@@ -485,7 +424,416 @@ This document outlines the unit tests for the `Profile` component, ensuring that
 - Ensures that users receive appropriate feedback for errors.
 - Prevents unintended state changes if an API call fails.
 
+# Backend Unit Tests
+
+This document lists the unit tests(added for Sprint3) for the backend of the application. Each test is designed to validate a specific functionality of the backend.
+
 ---
+
+### 1. **Deleting User ID**
+
+- **Purpose**: Ensures that the user ID deletion functionality works as expected and handles errors gracefully.
+- **Test Steps**:
+  - Render the `Profile` component.
+  - Simulate a click on the "Delete Account" button.
+  - Confirm the deletion action in the modal dialog.
+  - Verify that the `authService.deleteUser` function is called with the correct user ID.
+  - Check for a success message if the deletion is successful.
+  - Verify that the user is redirected to the login page after account deletion.
+
+### 2. **SessionValidationMiddleware**
+
+**Purpose**: Ensures all request have valid sessionId.
+
+- **Test Case 1**: Successful session validation
+
+  - **Input**: Valid session headers.
+  - **Expected Output**: HTTP 200 OK with `"success"`.
+  - **Mock**: `Validate(sessionID, userID) → true, nil`.
+
+- **Test Case 2**: Missing session ID
+
+  - **Input**: Request missing `X-Session-ID` header.
+  - **Expected Output**: HTTP 401 Unauthorized with `{"error": "Session-ID missing"}`.
+
+- **Test Case 3**: Invalid user ID
+
+  - **Input**: Request with non-numeric `userId`.
+  - **Expected Output**: HTTP 400 Bad Request with `{"error": "Invalid userId header"}`.
+
+- **Test Case 4**: Invalid session
+
+  - **Input**: Valid `X-Session-ID`, but validation fails.
+  - **Expected Output**: HTTP 401 Unauthorized with `{"error": "Invalid session"}`.
+  - **Mock**: `Validate(sessionID, userID) → false, "session expired"`.
+
+- **Test Case 5**: Valid session with request body
+  - **Input**: Valid session with request body.
+  - **Expected Output**: HTTP 200 OK with `"success"`.
+  - **Mock**: `Validate(sessionID, userID) → true, nil`.
+
+### 3. **Password Reset Handlers**
+
+**Purpose**: Test for reset and cahnge pasword API.
+
+- **Test Case 1**: Successful password reset via forgotten password
+
+  - **Input**: Valid email, correct OTP, new password.
+  - **Expected Output**: HTTP 200 OK with `{"message": "Password reset successfully. All active sessions logged out."}`.
+  - **Mock**: `GetUserByEmail → valid user`, `GetVerificationCode → correct OTP`, `UpdateUserPassword → success`, `DeleteAllSessions → success`, `CreateSession → new session ID`.
+
+- **Test Case 2**: Successful password change
+
+  - **Input**: Authenticated user, new password.
+  - **Expected Output**: HTTP 200 OK with `{"message": "Password reset successfully. All sessions logged out.", "sessionId": "newsession123", "userId": 123}`.
+  - **Mock**: `UpdateUserPassword → success`, `DeleteAllSessions → success`, `CreateSession → new session ID`.
+
+- **Test Case 3**: Invalid OTP for forgotten password reset
+  - **Input**: Valid email, incorrect OTP, new password.
+  - **Expected Output**: HTTP 401 Unauthorized with `{"error": "Invalid OTP"}`.
+  - **Mock**: `GetVerificationCode → incorrect OTP`.
+
+---
+
+# **UFMarketPlace API Documentation**
+
+This API handles user authentication and email verification.\
+**All error responses include a plain text message unless stated otherwise.**
+
+---
+
+## **Signup**
+
+Registers a new user.
+
+### **Endpoint**
+
+`POST /signup`
+
+### **Request Body (JSON)**
+
+```json
+{
+  "email": "user@example.com",
+  "name": "John Doe",
+  "password": "securepassword123"
+}
+```
+
+### **Success Response (JSON)**
+
+```json
+{
+  "message": "User registered successfully",
+  "userId": "123"
+}
+```
+
+### **Response Errors**
+
+| Status Code | Error Type            | Example Response Body                     |
+| ----------- | --------------------- | ----------------------------------------- |
+| 405         | Method Not Allowed    | "Method Not Allowed"                      |
+| 400         | Invalid Request       | "Email, Name, and Password required"      |
+| 400         | Duplicate Email       | "Email already registered"                |
+| 500         | Internal Server Error | "Could not register user: database error" |
+
+---
+
+## **Login**
+
+Authenticates a user.
+
+### **Endpoint**
+
+`POST /login`
+
+### **Request Body (JSON)**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword123"
+}
+```
+
+### **Success Response (JSON)**
+
+```json
+{
+  "sessionId": "abc123",
+  "name": "John Doe",
+  "email": "user@example.com",
+  "userId": "123"
+}
+```
+
+---
+
+## **Send Verification Code**
+
+Sends a verification code to the user's email.
+
+### **Endpoint**
+
+`POST /sendEmailVerificationCode`
+
+### **Request Body (JSON)**
+
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+### **Success Response (JSON)**
+
+```json
+{
+  "message": "Verification code sent successfully. Code will be active for 3 minutes."
+}
+```
+
+### **Response Errors**
+
+| Status Code | Error Type            | Example Response Body                         |
+| ----------- | --------------------- | --------------------------------------------- |
+| 405         | Method Not Allowed    | "Method Not Allowed"                          |
+| 400         | Invalid Request       | "Email is required for verification"          |
+| 400         | Already Verified      | "Account is already verified"                 |
+| 404         | User Not Found        | "Error getting user info..."                  |
+| 500         | Internal Server Error | "Error sending email: SMTP connection failed" |
+
+---
+
+## **Verify Email Verification Code**
+
+Verifies the email using a verification code.
+
+### **Endpoint**
+
+`POST /verifyEmailVerificationCode`
+
+### **Request Body (JSON)**
+
+```json
+{
+  "email": "user@example.com",
+  "code": "123456"
+}
+```
+
+### **Success Response (JSON)**
+
+```json
+{
+  "message": "Email user@example.com successfully verified",
+  "userId": "123"
+}
+```
+
+### **Already Verified Response (JSON)**
+
+```json
+{
+  "message": "Email associated with account is already verified"
+}
+```
+
+### **Response Errors**
+
+| Status Code | Error Type            | Example Response Body                        |
+| ----------- | --------------------- | -------------------------------------------- |
+| 405         | Method Not Allowed    | "Method Not Allowed"                         |
+| 400         | Invalid Request       | "Missing required fields: email and code"    |
+| 400         | Expired/Invalid Code  | "No active verification code found"          |
+| 410         | Code Expired          | "Verification code has expired"              |
+| 401         | Invalid Code          | "Invalid verification code"                  |
+| 500         | Internal Server Error | "Verification update failed: database error" |
+
+---
+
+This API ensures a smooth user authentication and email verification process for UFMarketPlace.
+
+## **Create Listing**
+
+Registers a new product listing.
+
+### **Endpoint**
+
+`POST /listings`
+
+### **Request Headers**
+
+- `userId` (required): The ID of the logged-in user.
+
+### **Request Body (Multipart Form Data)**
+
+| Field                | Type   | Description                             |
+| -------------------- | ------ | --------------------------------------- |
+| `productName`        | Text   | Name of the product.                    |
+| `productDescription` | Text   | Description of the product.             |
+| `price`              | Number | Price of the product.                   |
+| `category`           | Text   | Product category (e.g., "Electronics"). |
+| `images`             | File   | One or more image files.                |
+
+### **Success Response (JSON)**
+
+Returns all listings for the current user after creation.
+
+```json
+[
+  {
+    "id": 3,
+    "userId": 5,
+    "userName": "Alice",
+    "userEmail": "alice@example.com",
+    "productName": "Smartphone",
+    "productDescription": "Latest model smartphone",
+    "price": 799.99,
+    "category": "Electronics",
+    "createdAt": "2025-03-03T11:00:00Z",
+    "updatedAt": "2025-03-03T11:00:00Z",
+    "images": [
+      {
+        "id": 2,
+        "contentType": "image/jpeg",
+        "data": "..."
+      }
+    ]
+  }
+]
+```
+
+### **Response Errors**
+
+| Status Code | Error Type            | Example Response Body                        |
+| ----------- | --------------------- | -------------------------------------------- |
+| 400         | Invalid Request       | "Unable to parse form data", "Invalid price" |
+| 400         | Missing Header        | "Missing userId header"                      |
+| 500         | Internal Server Error | "error message"                              |
+
+---
+
+## **Get User Listings**
+
+Fetches all listings created by the current user.
+
+### **Endpoint**
+
+`GET /userListings`
+
+### **Request Headers**
+
+- `userId` (required): The ID of the logged-in user.
+
+### **Success Response (JSON)**
+
+```json
+[
+  {
+    "id": 3,
+    "userId": 5,
+    "userName": "Alice",
+    "userEmail": "alice@example.com",
+    "productName": "Smartphone",
+    "productDescription": "Latest model smartphone",
+    "price": 799.99,
+    "category": "Electronics",
+    "createdAt": "2025-03-03T11:00:00Z",
+    "updatedAt": "2025-03-03T11:00:00Z",
+    "images": [
+      {
+        "id": 2,
+        "contentType": "image/jpeg",
+        "data": "..."
+      }
+    ]
+  }
+]
+```
+
+### **Response Errors**
+
+| Status Code | Error Type             | Example Response Body                              |
+| ----------- | ---------------------- | -------------------------------------------------- |
+| 400         | Missing/Invalid Header | "Missing userId header" or "Invalid userId header" |
+| 500         | Internal Server Error  | "error message"                                    |
+
+---
+
+## **Edit Listing**
+
+Updates an existing listing (only if owned by the current user). If new images are provided, all existing images for that listing are replaced.
+
+### **Endpoint**
+
+`PUT /listing/edit`
+
+### **Request Headers**
+
+- `userId` (required): The ID of the logged-in user.
+
+### **Request Body (Multipart Form Data)**
+
+| Field                | Type   | Description                                           |
+| -------------------- | ------ | ----------------------------------------------------- |
+| `listingId`          | Number | ID of the listing to update.                          |
+| `productName`        | Text   | Optional. New product name.                           |
+| `productDescription` | Text   | Optional. New product description.                    |
+| `price`              | Number | Optional. New price.                                  |
+| `category`           | Text   | Optional. New category.                               |
+| `images`             | File   | Optional. New image files (replaces existing images). |
+
+### **Success Response (JSON)**
+
+```json
+{
+  "message": "Listing updated successfully"
+}
+```
+
+### **Response Errors**
+
+| Status Code | Error Type            | Example Response Body                        |
+| ----------- | --------------------- | -------------------------------------------- |
+| 400         | Invalid Request       | "Invalid listingId", "Invalid userId header" |
+| 401         | Unauthorized          | "Unauthorized"                               |
+| 500         | Internal Server Error | "error message"                              |
+
+---
+
+## **Delete Listing**
+
+Deletes an existing listing along with all its images (only if owned by the current user).
+
+### **Endpoint**
+
+`DELETE /listing/delete`
+
+### **Request Headers**
+
+- `userId` (required): The ID of the logged-in user.
+
+### **Query Parameters**
+
+- `listingId` (required): The ID of the listing to delete.
+
+### **Success Response (JSON)**
+
+```json
+{
+  "message": "Listing deleted successfully"
+}
+```
+
+### **Response Errors**
+
+| Status Code | Error Type            | Example Response Body                        |
+| ----------- | --------------------- | -------------------------------------------- |
+| 400         | Invalid Request       | "Invalid listingId", "Missing userId header" |
+| 401         | Unauthorized          | "Unauthorized"                               |
+| 500         | Internal Server Error | "error message"                              |
 
 ```
 
