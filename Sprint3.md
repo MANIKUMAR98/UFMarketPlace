@@ -870,12 +870,13 @@ Resets the password using a verification code sent to the user's email.
 
 ### **Request Body (JSON)**
 
-````json
+```json
 {
   "email": "user@example.com",
   "OTP": "123456",
   "password": "newsecurepassword123"
 }
+```
 
 ### **Success Response (JSON)**
 
@@ -883,8 +884,7 @@ Resets the password using a verification code sent to the user's email.
 {
   "message": "Password reset successfully. All active sessions logged out."
 }
-
-````
+```
 
 ### **Response Errors**
 
@@ -909,7 +909,7 @@ Changes the password for the authenticated user.
 {
   "password": "newsecurepassword123"
 }
-
+```
 
 ### **Success Response (JSON)**
 
@@ -919,7 +919,7 @@ Changes the password for the authenticated user.
   "sessionId": "abc123",
   "userId": "123"
 }
-
+```
 ### **Response Errors**
 
 | Status Code | Error Type            | Example Response Body                   |
@@ -928,7 +928,6 @@ Changes the password for the authenticated user.
 | 400         | Invalid OTP           | "Invalid verification code"             |
 | 401         | Unauthorized          | "Unauthorized"                          |
 | 500         | Internal Server Error | "Database error: Failed to reset password" |
-
 
 
 ## **Delete User**
