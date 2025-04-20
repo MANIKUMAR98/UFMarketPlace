@@ -36,6 +36,16 @@ export interface ProductResponse {
   category: string;
   userName: string;
   images: string[]; 
+  phone: string;
+  address: string;
+
+}
+
+export interface UserProfile {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
 }
 
 
@@ -176,6 +186,23 @@ export const authService = {
 
       const response = await api.put<ProductResponse[]>('/listing/updateListing', formData, config);
       return this.getListing();
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }, async getUserProfile(): Promise<UserProfile> {
+    try {
+      
+      const response = await api.get<UserProfile>('/getUserProfile');
+      return response.data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  },
+  async updateUserProfile(payload: any): Promise<UserProfile> {
+    try {
+      console.log(payload)
+      const response = await api.post<UserProfile>('/updateUserProfile', payload);
+      return response.data;
     } catch (error) {
       throw this.handleError(error);
     }

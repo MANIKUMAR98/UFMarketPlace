@@ -249,3 +249,43 @@
 .cancel-delete-btn:hover {
   background: #cbd5e0;
 }
+
+.edit-btn {
+  width: fit-content;
+  padding: 0.5rem 1rem;
+  background: #edf2f7;
+  color: #1a202c;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.edit-btn:hover {
+  background: #e2e8f0;
+}
+
+
+.value-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-left: auto;
+  padding: 0.2rem 0.5rem;
+  color: #4a5568;
+  transition: color 0.3s ease;
+}
+
+.icon-btn:hover {
+  color: #1a202c;
+}

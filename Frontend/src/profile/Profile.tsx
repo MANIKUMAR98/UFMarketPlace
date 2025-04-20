@@ -3,31 +3,41 @@ import { motion } from "framer-motion";
 import "./Profile.css";
 import Header from "../header/Header";
 import { authService } from "../AuthService";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface User {
   name: string;
   email: string;
+  phone?: string;
+  address?: string;
 }
 
 const Profile = () => {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState<string>("");
-  const [newPassword, setNewPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<string>("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [deleteError, setDeleteError] = useState<string>("");
-  const [deleteSuccess, setDeleteSuccess] = useState<string>("");
-
-  const [userEmail, setUserEmail] = useState<string>("");
-  const [name, setName] = useState<string>("");
+  const [deleteError, setDeleteError] = useState("");
+  const [deleteSuccess, setDeleteSuccess] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
 
   useEffect(() => {
-    const email = sessionStorage.getItem("email") || "mani@gmail.com";
-    const userName = sessionStorage.getItem("name") || "";
-    setUserEmail(email);
-    setName(userName);
+    const fetchUserProfile = async () => {
+      const userProfile = await authService.getUserProfile();
+      setUserEmail(userProfile.email);
+      setName(userProfile.name);
+      setPhone(userProfile.phone || "");
+      setAddress(userProfile.address || "");
+    };
+    fetchUserProfile();
   }, []);
 
   const handlePasswordChange = async (e: FormEvent) => {
@@ -61,6 +71,20 @@ const Profile = () => {
     }
   };
 
+  const handleSave = async (field: "phone" | "address") => {
+    try {
+      const updates: Partial<User> =
+        field === "phone" ? { phone } : { address };
+      await authService.updateUserProfile({
+        phone: phone,
+        address: address,
+      });
+      field === "phone" ? setIsEditingPhone(false) : setIsEditingAddress(false);
+    } catch (err) {
+      alert(`Failed to update ${field}`);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -69,7 +93,6 @@ const Profile = () => {
       className="profile-container"
     >
       <h1 className="profile-title">Profile</h1>
-
       <div className="profile-content">
         <div className="profile-field">
           <label className="profile-label">Name</label>
@@ -79,6 +102,94 @@ const Profile = () => {
         <div className="profile-field">
           <label className="profile-label">Email</label>
           <p className="profile-value">{userEmail}</p>
+        </div>
+
+        <div className="profile-field">
+          <label className="profile-label">Phone</label>
+          {isEditingPhone ? (
+            <>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="form-input"
+              />
+              <div className="form-buttons">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="password-submit-btn"
+                  onClick={() => handleSave("phone")}
+                >
+                  Save
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="cancel-btn"
+                  onClick={() => setIsEditingPhone(false)}
+                >
+                  Cancel
+                </motion.button>
+              </div>
+            </>
+          ) : (
+            <div className="value-with-icon">
+              <p className="profile-value">{phone}</p>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="icon-btn"
+                onClick={() => setIsEditingPhone(true)}
+              >
+                <i className="fa-solid fa-pencil"></i>
+              </motion.button>
+            </div>
+          )}
+        </div>
+
+        <div className="profile-field">
+          <label className="profile-label">Address</label>
+          {isEditingAddress ? (
+            <>
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="form-input"
+              />
+              <div className="form-buttons">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="password-submit-btn"
+                  onClick={() => handleSave("address")}
+                >
+                  Save
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="cancel-btn"
+                  onClick={() => setIsEditingAddress(false)}
+                >
+                  Cancel
+                </motion.button>
+              </div>
+            </>
+          ) : (
+            <div className="value-with-icon">
+              <p className="profile-value">{address}</p>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="icon-btn"
+                onClick={() => setIsEditingAddress(true)}
+              >
+                <i className="fa-solid fa-pencil"></i>
+              </motion.button>
+            </div>
+          )}
         </div>
 
         {!showPasswordForm && (

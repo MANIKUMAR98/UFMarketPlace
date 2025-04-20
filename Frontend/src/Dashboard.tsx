@@ -16,6 +16,8 @@ interface Product {
   images: string[];
   userName: string;
   userEmail: string;
+  phone: string;
+  address: string;
 }
 
 const Dashboard: React.FC = () => {
@@ -43,6 +45,8 @@ const Dashboard: React.FC = () => {
             ),
             userName: prod.userName,
             userEmail: prod.userEmail,
+            phone: prod.phone,
+            address: prod.address,
           }));
           setProducts(updatedProducts);
           setFilteredProducts(updatedProducts); // initially show all
@@ -228,10 +232,18 @@ const Dashboard: React.FC = () => {
                         {selectedProduct.userName}
                       </p>
                       <p className="seller-email">
+                        <span className="icon">📱</span>
+                        {selectedProduct.phone}
+                      </p>
+                      <p className="seller-email">
                         <span className="icon">✉️</span>
                         <a href={`mailto:${selectedProduct.userEmail}`}>
                           {selectedProduct.userEmail}
                         </a>
+                      </p>
+                      <p className="seller-email">
+                        <span className="icon">🏠</span>
+                        {selectedProduct.address}
                       </p>
                     </div>
                   </div>
