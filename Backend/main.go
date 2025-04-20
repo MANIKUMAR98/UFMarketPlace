@@ -83,7 +83,9 @@ func main() {
 	router.HandleFunc("/verifyEmailVerificationCode", verifyCodeHandler)
 	router.HandleFunc("/resetPassword", resetForgetPasswordHandler)
 	router.Handle("/changePassword", SessionValidationMiddleware(http.HandlerFunc(changePasswordHandler)))
+	router.Handle("/updateUserProfile", SessionValidationMiddleware(http.HandlerFunc(updateUserProfileHandler)))
 	router.HandleFunc("/deleteUser", deleteUserHandler)
+	router.Handle("/getUserProfile", SessionValidationMiddleware(http.HandlerFunc(getUserProfileHandler)))
 	handler := c.Handler(router)
 
 	port := os.Getenv("PORT")
@@ -128,7 +130,7 @@ func SessionValidationMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		fmt.Print(sessionID)
+		// fmt.Print(sessionID)
 		// Step 3: Validate session for the user
 		_, err = ValidateSession(sessionID, userID)
 

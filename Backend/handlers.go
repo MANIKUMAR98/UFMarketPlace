@@ -8,8 +8,10 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"time"
+	"regexp"
 	"strconv"
+	"time"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -47,6 +49,11 @@ type VerificationRequest struct {
 type VerifyCodeRequest struct {
     Email string `json:"email"`
     Code      string `json:"code"`
+}
+
+type userProfile struct {
+	Phone *string `json:"phone"`
+	Address *string `json:"address"`
 }
 
 
@@ -159,7 +166,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, storedHash, name, _, verificationStatus, err := GetUserInfo(userID)
+	userID, storedHash, name, _, verificationStatus, _, _, err := GetUserInfo(userID)
 
 	if err != nil {
 		http.Error(w, "Error getting user details", http.StatusInternalServerError)
@@ -226,7 +233,7 @@ func sendVerificationCodeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId, _, _, _, _, err =  GetUserInfo(userId)
+	userId, _, _, _, _, _, _, err =  GetUserInfo(userId)
 
 	if err != nil {
 		http.Error(w, "Error getting user info. Actual error: "+err.Error(), http.StatusInternalServerError)
@@ -291,7 +298,7 @@ func verifyCodeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId, _, _, _, verificationStatus, err :=  GetUserInfo(userId)
+	userId, _, _, _, verificationStatus, _, _, err :=  GetUserInfo(userId)
 
 	if err != nil {
 		http.Error(w, "Error getting user info", http.StatusInternalServerError)
@@ -486,4 +493,101 @@ func changePasswordHandler(w http.ResponseWriter, r *http.Request) {
         "sessionId": newSessionId,
         "userId":    userId,
     })
+}
+
+
+func updateUserProfileHandler(w http.ResponseWriter, r *http.Request) {
+	// Only allow POST
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Get userId from header
+	currentUserID := r.Header.Get("userId")
+	userID, err := strconv.Atoi(currentUserID)
+	if err != nil {
+		http.Error(w, "Invalid userId header", http.StatusBadRequest)
+		return
+	}
+
+	// Parse request body
+	var profile userProfile
+	if err := json.NewDecoder(r.Body).Decode(&profile); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	// Throw error if both phone and address are nil or empty
+	if (profile.Phone == nil ) && (profile.Address == nil ) {
+		http.Error(w, "At least one of phone or address must be provided", http.StatusBadRequest)
+		return
+	}
+
+	// Validate phone if present
+	if profile.Phone != nil && *profile.Phone != "" && !isValidPhone(*profile.Phone) {
+		http.Error(w, "Invalid phone format", http.StatusBadRequest)
+		return
+	}
+
+	// Perform the DB update
+	err = updateUserPhoneAndAddress(userID, profile.Phone, profile.Address)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Database update failed: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	_, _, _, _, _, phone, address, err := GetUserInfo(userID)
+	if err != nil {
+		http.Error(w, "Error getting user details", http.StatusInternalServerError)
+		return
+	}
+	// Success
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Profile updated successfully",
+		"address": address,
+		"phone": phone,	
+	})
+}
+
+
+
+func getUserProfileHandler(w http.ResponseWriter, r *http.Request) {
+	// Only allow POST
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Get userId from header
+	currentUserID := r.Header.Get("userId")
+	userID, err := strconv.Atoi(currentUserID)
+	if err != nil {
+		http.Error(w, "Invalid userId header", http.StatusBadRequest)
+		return
+	}
+
+	_, _, name, email, _, phone, address, err := GetUserInfo(userID)
+	if err != nil {
+		http.Error(w, "Error getting user details", http.StatusInternalServerError)
+		return
+	}
+	// Success
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"address": address,
+		"phone": phone,	
+		"email": email,
+		"name": name,
+	})
+}
+
+
+func isValidPhone(phone string) bool {
+	// Regex allows optional + followed by exactly 10 digits
+	re := regexp.MustCompile(`^\+?[0-9]{10}$`)
+	return re.MatchString(phone)
 }

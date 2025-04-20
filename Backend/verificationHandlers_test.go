@@ -15,8 +15,8 @@ import (
 func TestSendVerificationCodeHandler_Success(t *testing.T) {
 	// Mock user lookup and verification status
 	GetUserByEmail = func(email string) (int, string, string, error) { return 123, "", "", nil }
-	GetUserInfo = func(userId int) (int, string, string, string, int, error) {
-		return userId, "", "", "", 0, nil // Unverified
+	GetUserInfo = func(userId int) (int, string, string, string, int, string, string, error) {
+		return userId, "", "", "", 0, "", "", nil // Unverified
 	}
 	StoreVerificationCode = func(userId int, email, code string) error { return nil }
 	utils.SendVerificationCode = func(email, code string) error { return nil }

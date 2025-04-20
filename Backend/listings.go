@@ -29,6 +29,8 @@ type Listing struct {
 	CreatedAt          time.Time                `json:"createdAt"`
 	UpdatedAt          time.Time                `json:"updatedAt"`
 	Images             []map[string]interface{} `json:"images"`
+	UserAddress			string                   `json:"address"`
+	UserPhone           string                   `json:"phone"`
 }
 
 // saveImage saves an uploaded image to disk.
@@ -79,7 +81,7 @@ func listingsHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Join with users table to get the username
 		rows, err := db.Query(
-			"SELECT l.id, l.user_id, u.name, u.email, l.product_name, l.product_description, l.price, l.category, l.created_at, l.updated_at "+
+			"SELECT l.id, l.user_id, u.name, u.email, u.phone, u.address, l.product_name, l.product_description, l.price, l.category, l.created_at, l.updated_at "+
 				"FROM listings l JOIN users u ON u.id = l.user_id WHERE l.user_id <> $1", currentUserID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -92,13 +94,17 @@ func listingsHandler(w http.ResponseWriter, r *http.Request) {
 			var l Listing
 			var userName string
 			var userEmail string
+			var UserPhone string
+			var userAddress string
 
-			if err := rows.Scan(&l.ID, &l.UserID, &userName, &userEmail, &l.ProductName, &l.ProductDescription, &l.Price, &l.Category, &l.CreatedAt, &l.UpdatedAt); err != nil {
+			if err := rows.Scan(&l.ID, &l.UserID, &userName, &userEmail, &UserPhone, &userAddress, &l.ProductName, &l.ProductDescription, &l.Price, &l.Category, &l.CreatedAt, &l.UpdatedAt); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 			l.UserName = userName
 			l.UserEmail = userEmail
+			l.UserAddress = userAddress
+			l.UserPhone = UserPhone
 
 			// Fetch image data for listing.
 			imageRows, err := db.Query("SELECT id, image_data, content_type FROM listing_images WHERE listing_id = $1", l.ID)
@@ -241,6 +247,12 @@ func userListingsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid userId header", http.StatusBadRequest)
 		return
 	}
+	_, _, _, _, _, phone, address, err := GetUserInfo(userID)
+	if err != nil {
+		http.Error(w, "Error getting user details", http.StatusInternalServerError)
+		return
+	}
+
 
 	rows, err := db.Query("SELECT id, user_id, product_name, product_description, price, category, created_at, updated_at FROM listings WHERE user_id = $1", userID)
 	if err != nil {
@@ -256,6 +268,8 @@ func userListingsHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		l.UserAddress = address
+		l.UserPhone = phone
 		// Fetch image data.
 		imageRows, err := db.Query("SELECT id, image_data, content_type FROM listing_images WHERE listing_id = $1", l.ID)
 		if err == nil {

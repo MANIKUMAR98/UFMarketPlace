@@ -13,14 +13,16 @@ import (
 // initDB creates the users and sessions tables in PostgreSQL.
 func initDB() error {
 	usersTable := `
-	CREATE TABLE IF NOT EXISTS users (
-		id SERIAL PRIMARY KEY,
-		email TEXT UNIQUE NOT NULL,
-		name TEXT NOT NULL,
-		password TEXT NOT NULL,
-		verification_status INTEGER DEFAULT 0,
-		created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-	);`
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    password TEXT NOT NULL,
+    verification_status INTEGER DEFAULT 0,
+    phone TEXT DEFAULT '',
+    address TEXT DEFAULT '',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);`
 	if _, err := db.Exec(usersTable); err != nil {
 		return fmt.Errorf("error creating users table: %v", err)
 	}
@@ -82,14 +84,17 @@ var GetUserByEmail = func(useremail string) (int, string, string, error) {
 
 
 
-var GetUserInfo = func(userId int) (int, string, string, string, int, error){
+var GetUserInfo = func(userId int) (int, string, string, string, int, string, string, error){
 	var userID int
 	var email string
 	var storedHash string
 	var name string
 	var verificationStatus int
-	err := db.QueryRow("SELECT id, password, name, email, verification_status FROM users WHERE id = $1", userId ).Scan(&userID, &storedHash, &name, &email, &verificationStatus)
-	return userID, storedHash, name, email, verificationStatus, err
+	var phone string
+	var address string
+	err := db.QueryRow("SELECT id, password, name, email, verification_status, phone, address FROM users WHERE id = $1", userId ).
+	Scan(&userID, &storedHash, &name, &email, &verificationStatus, &phone, &address)
+	return userID, storedHash, name, email, verificationStatus, phone, address, err
 }
 
 
@@ -244,4 +249,17 @@ var DeleteAllSessions = func(userId int) error {
     query := "DELETE FROM sessions WHERE user_id = $1"
     _, err := db.Exec(query, userId)
     return err
+}
+
+
+var updateUserPhoneAndAddress = func(userID int, phone *string, address *string) error {
+	// Prepare SQL query to update password and address, using COALESCE to keep existing values if no new ones are provided
+	// fmt.Println(*phone, *address)
+	query := `UPDATE users SET phone = COALESCE($1, phone), address = COALESCE($2, address) WHERE id = $3;`
+
+	// Execute the query, passing the new password and address (if they're not nil)
+	_, err := db.Exec(query, phone, address, userID)
+	
+
+	return err
 }

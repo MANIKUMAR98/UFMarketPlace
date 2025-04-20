@@ -93,7 +93,6 @@ func TestResetForgetPasswordHandler(t *testing.T) {
 			mockSetup: func() {
 				mockDB.On("GetUserByEmail", "test@uf.edu").Return(1, "", "", nil)
 				mockDB.On("GetVerificationCode", 1).Return("123456", time.Now().Add(1*time.Hour), nil)
-				mockDB.On("DeleteVerificationCode", 1).Return(nil)
 				mockDB.On("UpdateUserPassword", 1, mock.Anything).Return(nil)
 				mockDB.On("DeleteAllSessions", 1).Return(nil)
 			},

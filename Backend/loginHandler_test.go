@@ -23,8 +23,8 @@ func TestLoginHandler_Success(t *testing.T) {
 	defer func() { GetUserByEmail = originalGetUserByEmail }() // Restore the original function
 
 	originalGetUserInfo := GetUserInfo // Save the original function
-	GetUserInfo = func(userId int) (int, string, string, string, int, error) {
-		return userId, "", "", "", 1, nil // Verified
+	GetUserInfo = func(userId int) (int, string, string, string, int, string, string, error) {
+		return userId, "", "", "", 1, "", "", nil // Verified
 	}
 	defer func() { GetUserInfo = originalGetUserInfo }() // Restore the original function
 
@@ -53,8 +53,8 @@ func TestLoginHandler_UnverifiedEmail(t *testing.T) {
 	GetUserByEmail = func(email string) (int, string, string, error) {
 		return 123, string(hashedPassword), "Gator", nil
 	}
-	GetUserInfo = func(userId int) (int, string, string, string, int, error) {
-		return userId, "", "", "", 0, nil // Unverified
+	GetUserInfo = func(userId int) (int, string, string, string, int, string, string, error) {
+		return userId, "", "", "", 0, "", "", nil // Unverified
 	}
 
 	creds := LogInCredentials{Email: "gator@uf.edu", Password: "password"}
