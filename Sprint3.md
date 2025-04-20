@@ -933,3 +933,40 @@ Changes the password for the authenticated user.
 ```
 
 ```
+
+
+
+---
+
+## **Delete User**
+
+Deletes an existing user based on the `userId` provided in the request header.
+
+### **Endpoint**
+
+`DELETE /user/deleteUser`
+
+### **Request Headers**
+
+- `userId` (required): The ID of the user to be deleted.
+
+### **Request Body**
+
+- None
+
+### **Success Response (JSON)**
+
+```json
+{
+  "message": "User deleted successfully"
+}
+```
+
+### **Response Errors**
+
+| Status Code | Error Type            | Example Response Body                        |
+| ----------- | --------------------- | -------------------------------------------- |
+| 400         | Invalid Request       | "Invalid sessionId", "Missing required fields" |
+| 401         | Unauthorized          | "Session expired", "Invalid credentials"     |
+| 404         | Not Found             | "Resource not found"                         |
+| 500         | Internal Server Error | "Unexpected server error"      
