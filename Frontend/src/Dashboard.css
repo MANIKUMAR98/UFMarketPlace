@@ -354,3 +354,34 @@
     max-height: 40vh;
   }
 }
+
+
+.filter-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  background: #f8f9fa;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 180px;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.filter-group select,
+.filter-group input[type="range"] {
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}

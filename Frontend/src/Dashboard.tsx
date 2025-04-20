@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Header from "./header/Header";
-import Footer from "./footer/Footer";
 import Modal from "react-modal";
 import Slider from "react-slick";
+import { motion, AnimatePresence } from "framer-motion";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./Dashboard.css";
@@ -21,8 +20,11 @@ interface Product {
 
 const Dashboard: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [priceRange, setPriceRange] = useState<number>(1000000);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -43,6 +45,7 @@ const Dashboard: React.FC = () => {
             userEmail: prod.userEmail,
           }));
           setProducts(updatedProducts);
+          setFilteredProducts(updatedProducts); // initially show all
         }
       } catch (error) {
         console.error("Error fetching listings:", error);
@@ -51,10 +54,27 @@ const Dashboard: React.FC = () => {
     fetchListings();
   }, []);
 
+  useEffect(() => {
+    const filtered = products.filter((prod) => {
+      prod.price = prod.price.replaceAll("$", "");
+      const price = Number(prod.price);
+      const categoryMatch =
+        selectedCategory === "all" || prod.category === selectedCategory;
+      const priceMatch = price <= priceRange;
+      prod.price = prod.price + "$";
+      return categoryMatch && priceMatch;
+    });
+    setFilteredProducts(filtered);
+  }, [products, selectedCategory, priceRange]);
+
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
   };
+
+  const categories = Array.from(
+    new Set(products.map((p) => p.category))
+  ).filter(Boolean);
 
   const carouselSettings = {
     dots: true,
@@ -77,35 +97,83 @@ const Dashboard: React.FC = () => {
   return (
     <div className="app-container">
       <div className="dashboard-container">
-        <div className="products-grid">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="product-card"
-              onClick={() => handleProductClick(product)}
+        {/* Filter Panel */}
+        <motion.div
+          className="filter-panel"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="filter-group">
+            <label htmlFor="category">Category</label>
+            <select
+              id="category"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
             >
-              <div className="product-image-container">
-                {product.images.length > 0 ? (
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="product-thumbnail"
-                  />
-                ) : (
-                  <div className="no-image-placeholder">No Image</div>
-                )}
-              </div>
-              <div className="product-info">
-                <h3>{product.name}</h3>
-                <div className="price-category">
-                  <span className="price">{product.price}</span>
-                  <span className="category">{product.category}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+              <option value="all">All</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label htmlFor="price">Max Price: ${priceRange}</label>
+            <input
+              type="range"
+              id="price"
+              min={0}
+              max={1000000}
+              value={priceRange}
+              onChange={(e) => setPriceRange(Number(e.target.value))}
+            />
+          </div>
+        </motion.div>
+
+        {/* Product Grid */}
+        <div className="products-grid">
+          {filteredProducts.length === 0 ? (
+            <div className="empty-state">No products match your filters.</div>
+          ) : (
+            <AnimatePresence>
+              {filteredProducts.map((product) => (
+                <motion.div
+                  key={product.id}
+                  className="product-card"
+                  onClick={() => handleProductClick(product)}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="product-image-container">
+                    {product.images.length > 0 ? (
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="product-thumbnail"
+                      />
+                    ) : (
+                      <div className="no-image-placeholder">No Image</div>
+                    )}
+                  </div>
+                  <div className="product-info">
+                    <h3>{product.name}</h3>
+                    <div className="price-category">
+                      <span className="price">{product.price}</span>
+                      <span className="category">{product.category}</span>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
         </div>
 
+        {/* Modal */}
         <Modal
           isOpen={isModalOpen}
           onRequestClose={() => setIsModalOpen(false)}
