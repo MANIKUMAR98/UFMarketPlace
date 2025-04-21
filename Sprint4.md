@@ -696,3 +696,114 @@ These APIs help in adding and getting of address and phone number of the user
 | 500         | Internal Server Error | `"Error getting user details"`               |
 
 ---
+
+# Backend Unit Tests
+
+This document lists the unit tests(added for Sprint 4) for the backend of the application. Each test is designed to validate a specific functionality of the backend.
+
+---
+
+### 1. **IsValidPhone Function**
+
+**Purpose**: Validates phone number format for user profiles.
+
+- **Test Case 1**: Valid 10-digit phone
+  - **Input**: "1234567890"
+  - **Expected Output**: true
+
+- **Test Case 2**: Valid phone with plus prefix
+  - **Input**: "+1234567890"
+  - **Expected Output**: true
+
+- **Test Case 3**: Too short phone number
+  - **Input**: "123456789"
+  - **Expected Output**: false
+
+- **Test Case 4**: Too long phone number
+  - **Input**: "12345678901"
+  - **Expected Output**: false
+
+- **Test Case 5**: Phone with non-numeric characters
+  - **Input**: "123456789a"
+  - **Expected Output**: false
+
+- **Test Case 6**: Phone with special characters
+  - **Input**: "123456-890"
+  - **Expected Output**: false
+
+- **Test Case 7**: Empty phone string
+  - **Input**: ""
+  - **Expected Output**: false
+
+### 2. **UpdateUserProfileHandler**
+
+**Purpose**: Updates a user's phone number and/or address in the database.
+
+- **Test Case 1**: Successful update with both phone and address
+  - **Input**: HTTP POST with header `userId=42` and JSON body `{"phone": "1234567890", "address": "123 Main St"}`
+  - **Expected Output**: HTTP 200 OK with JSON body `{"message":"Profile updated successfully", "phone":"1234567890", "address":"123 Main St"}`
+  - **Mock**: Update succeeds and GetUserInfo returns updated values.
+
+- **Test Case 2**: Successful update with only phone
+  - **Input**: HTTP POST with header `userId=42` and JSON body `{"phone": "1234567890"}`
+  - **Expected Output**: HTTP 200 OK with JSON body containing updated phone and empty address
+  - **Mock**: Update succeeds and GetUserInfo returns updated phone with empty address.
+
+- **Test Case 3**: Successful update with only address
+  - **Input**: HTTP POST with header `userId=42` and JSON body `{"address": "123 Main St"}`
+  - **Expected Output**: HTTP 200 OK with JSON body containing updated address and empty phone
+  - **Mock**: Update succeeds and GetUserInfo returns updated address with empty phone.
+
+- **Test Case 4**: Invalid HTTP method
+  - **Input**: HTTP GET request instead of POST
+  - **Expected Output**: HTTP 405 Method Not Allowed
+  - **Mock**: None needed, test checks for method validation.
+
+- **Test Case 5**: Invalid user ID format
+  - **Input**: HTTP POST with header `userId=invalid`
+  - **Expected Output**: HTTP 400 Bad Request with body `"Invalid userId header"`
+  - **Mock**: None needed, test checks for user ID validation.
+
+- **Test Case 6**: Invalid phone format
+  - **Input**: HTTP POST with header `userId=42` and JSON body `{"phone": "123"}`
+  - **Expected Output**: HTTP 400 Bad Request with body `"Invalid phone format"`
+  - **Mock**: None needed, test checks for phone validation.
+
+- **Test Case 7**: Database update error
+  - **Input**: HTTP POST with header `userId=42` and JSON body `{"phone": "1234567890"}`
+  - **Expected Output**: HTTP 500 Internal Server Error with body `"Database update failed: database error"`
+  - **Mock**: Update function returns database error.
+
+- **Test Case 8**: GetUserInfo error after update
+  - **Input**: HTTP POST with header `userId=42` and JSON body `{"phone": "1234567890"}`
+  - **Expected Output**: HTTP 500 Internal Server Error with body `"Error getting user details"`
+  - **Mock**: Update succeeds but GetUserInfo returns error.
+
+### 3. **GetUserProfileHandler**
+
+**Purpose**: Retrieves a user's profile information including name, email, phone, and address.
+
+- **Test Case 1**: Successful profile retrieval with complete profile
+  - **Input**: HTTP GET with header `userId=42`
+  - **Expected Output**: HTTP 200 OK with JSON body containing name, email, phone, and address
+  - **Mock**: GetUserInfo returns complete user information.
+
+- **Test Case 2**: Successful profile retrieval with partial profile (missing phone/address)
+  - **Input**: HTTP GET with header `userId=42`
+  - **Expected Output**: HTTP 200 OK with JSON body containing name, email, and empty phone/address
+  - **Mock**: GetUserInfo returns user with empty phone and address.
+
+- **Test Case 3**: Invalid HTTP method
+  - **Input**: HTTP POST request instead of GET
+  - **Expected Output**: HTTP 405 Method Not Allowed
+  - **Mock**: None needed, test checks for method validation.
+
+- **Test Case 4**: Invalid user ID format
+  - **Input**: HTTP GET with header `userId=invalid`
+  - **Expected Output**: HTTP 400 Bad Request with body `"Invalid userId header"`
+  - **Mock**: None needed, test checks for user ID validation.
+
+- **Test Case 5**: GetUserInfo error
+  - **Input**: HTTP GET with header `userId=42`
+  - **Expected Output**: HTTP 500 Internal Server Error with body `"Error getting user details"`
+  - **Mock**: GetUserInfo returns database error.
