@@ -95,7 +95,14 @@ cd Backend
 go build
 ```
 
-3. Run the application:
+4. Run Unit Tests:
+
+```bash
+go test -v
+
+```
+
+5. Run the application:
 
 ```bash
 go run .
