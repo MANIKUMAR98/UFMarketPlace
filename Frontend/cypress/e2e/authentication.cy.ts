@@ -51,8 +51,8 @@ describe('Authentication Page', () => {
   
     it('redirects to /dashboard on successful login', () => {
 
-      cy.get('input').eq(0).type('dineshramdanaraj@ufl.edu');   // Email
-      cy.get('input').eq(1).type('password123');    // Password
+      cy.get('input').eq(0).type('manikuma.honnena@ufl.edu');   // Email
+      cy.get('input').eq(1).type('12345678');    // Password
   
 
       cy.get('.submit-btn').click();
