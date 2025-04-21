@@ -656,3 +656,43 @@ These APIs help in adding and getting of address and phone number of the user
 | 500         | Internal Server Error | `"Database update failed: ..."`, `"Error getting user details"`                                                              |
 
 ---
+
+# Get User Profile
+
+## Endpoint
+
+`GET /getUserProfile`
+
+---
+
+## Request Headers
+
+| Header Name    | Required | Description                                   |
+| -------------- | -------- | --------------------------------------------- |
+| `userId`       | Yes      | The ID of the user whose profile is requested |
+| `X-Session-ID` | Yes      | Valid session ID for the user                 |
+
+---
+
+## Success Response (JSON)
+
+```json
+{
+  "address": "SW 3000",
+  "phone": "1234567891",
+  "email": "user@example.com",
+  "name": "John Doe"
+}
+```
+
+## Response Errors
+
+| Status Code | Error Type            | Example Response Body                        |
+| ----------- | --------------------- | -------------------------------------------- |
+| 400         | Invalid Request       | `"Invalid userId header"`                    |
+| 401         | Unauthorized          | `"Session expired"`, `"Invalid credentials"` |
+| 404         | Not Found             | `"User not found"`                           |
+| 405         | Method Not Allowed    | `"Method Not Allowed"`                       |
+| 500         | Internal Server Error | `"Error getting user details"`               |
+
+---
