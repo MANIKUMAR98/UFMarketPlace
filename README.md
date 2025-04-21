@@ -25,7 +25,7 @@ UFMarketplace is a web-based platform exclusively designed for the University of
 
 ---
 
-### 🗃️ Database Setup (PostgreSQL)
+### Database Setup (PostgreSQL)
 
 1. **Install PostgreSQL** on your system (from [https://www.postgresql.org/download](https://www.postgresql.org/download) or using your OS package manager).
 2. **Create a new database** (e.g., `ufmarketplace`).
