@@ -1,6 +1,6 @@
 describe("Sell Component", () => {
     beforeEach(() => {
-        
+      cy.visit("http://localhost:5173/login"); 
       cy.get('input').eq(0).type('manikuma.honnena@ufl.edu');   // Email
       cy.get('input').eq(1).type('12345678');    // Password
   
