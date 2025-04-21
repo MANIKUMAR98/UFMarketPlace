@@ -19,13 +19,13 @@ UFMarketplace is a web-based platform exclusively designed for the University of
 
 --
 
-### Steps to intsall and run
+# Steps to intsall and run
 
 ## Backend
 
 ---
 
-## 🗃️ Database Setup (PostgreSQL)
+### 🗃️ Database Setup (PostgreSQL)
 
 1. **Install PostgreSQL** on your system (from [https://www.postgresql.org/download](https://www.postgresql.org/download) or using your OS package manager).
 2. **Create a new database** (e.g., `ufmarketplace`).
@@ -55,7 +55,7 @@ $env:POSTGRES_CONN="postgres://ufmarketplace:yourpassword@localhost:5432/ufmarke
 
 ---
 
-# Install Go
+## Install Go
 
 1. Download Go from the official site:  
    https://go.dev/dl/
@@ -72,7 +72,7 @@ You should see the installed version printed.
 
 ---
 
-# Clone the Repository
+## Clone the Repository
 
 Clone the project to your local machine using Git:
 
@@ -81,7 +81,7 @@ git clone https://github.com/MANIKUMAR98/UFMarketPlace.git
 cd UFMarketPlace
 ```
 
-# Build and Run the Application
+## Build and Run the Application
 
 1. Navigate to the backend directory:
 
