@@ -1,8 +1,34 @@
 ## Details of Work Completed in Sprint 4
 
-- Added new API to add user's address and phone number to be displayed in the post made in Contact me.
-- Added API to get user's address and phone number
-- Added Unit tests to validate get and add user's address and phone number API
+# Sprint 4 User Stories & Completed Frontend Issues
+
+## User Stories (Frontend)
+
+| ID     | User Story                                                                                  |
+| ------ | ------------------------------------------------------------------------------------------- |
+| US-031 | As a user, I want to add my phone number to my profile for better contact options.          |
+| US-032 | As a user, I want to add my address to my profile for improved service relevance.           |
+| US-033 | As a user, I want to see phone numbers displayed on each listing for quick communication.   |
+| US-034 | As a user, I want to see addresses displayed on each listing for location clarity.          |
+| US-035 | As a user, I want to filter listings on the dashboard to find relevant results easily.      |
+| US-036 | As a tester, I want to verify that profile updates (phone/address) are saved and displayed. |
+| US-037 | As a mobile user, I want the new profile fields to be responsive and user-friendly.         |
+| US-038 | As a user, I want feedback when I update my phone number or address.                        |
+
+---
+
+## Completed Frontend Issues
+
+| Issue | Description                      | Evidence                                  |
+| ----- | -------------------------------- | ----------------------------------------- |
+| #311  | Add phone number to profile      | ProfileForm.tsx input, validation added   |
+| #312  | Add address to profile           | ProfileForm.tsx input, validation added   |
+| #313  | Display phone number in listings | ListingCard.tsx shows phone field         |
+| #314  | Display address in listings      | ListingCard.tsx shows address field       |
+| #315  | Listing filter on dashboard      | Dashboard.tsx filter dropdown, logic      |
+| #316  | Profile update feedback          | Snackbar/Toast on save in ProfileForm.tsx |
+| #317  | Responsive profile fields        | Mobile styles in ProfileForm.module.css   |
+| #318  | Profile update tests             | Jest tests for phone/address persistence  |
 
 ## Cypress Authentication Tests (`authentication.cy.ts`)
 
@@ -708,26 +734,32 @@ This document lists the unit tests(added for Sprint 4) for the backend of the ap
 **Purpose**: Validates phone number format for user profiles.
 
 - **Test Case 1**: Valid 10-digit phone
+
   - **Input**: "1234567890"
   - **Expected Output**: true
 
 - **Test Case 2**: Valid phone with plus prefix
+
   - **Input**: "+1234567890"
   - **Expected Output**: true
 
 - **Test Case 3**: Too short phone number
+
   - **Input**: "123456789"
   - **Expected Output**: false
 
 - **Test Case 4**: Too long phone number
+
   - **Input**: "12345678901"
   - **Expected Output**: false
 
 - **Test Case 5**: Phone with non-numeric characters
+
   - **Input**: "123456789a"
   - **Expected Output**: false
 
 - **Test Case 6**: Phone with special characters
+
   - **Input**: "123456-890"
   - **Expected Output**: false
 
@@ -740,36 +772,43 @@ This document lists the unit tests(added for Sprint 4) for the backend of the ap
 **Purpose**: Updates a user's phone number and/or address in the database.
 
 - **Test Case 1**: Successful update with both phone and address
+
   - **Input**: HTTP POST with header `userId=42` and JSON body `{"phone": "1234567890", "address": "123 Main St"}`
   - **Expected Output**: HTTP 200 OK with JSON body `{"message":"Profile updated successfully", "phone":"1234567890", "address":"123 Main St"}`
   - **Mock**: Update succeeds and GetUserInfo returns updated values.
 
 - **Test Case 2**: Successful update with only phone
+
   - **Input**: HTTP POST with header `userId=42` and JSON body `{"phone": "1234567890"}`
   - **Expected Output**: HTTP 200 OK with JSON body containing updated phone and empty address
   - **Mock**: Update succeeds and GetUserInfo returns updated phone with empty address.
 
 - **Test Case 3**: Successful update with only address
+
   - **Input**: HTTP POST with header `userId=42` and JSON body `{"address": "123 Main St"}`
   - **Expected Output**: HTTP 200 OK with JSON body containing updated address and empty phone
   - **Mock**: Update succeeds and GetUserInfo returns updated address with empty phone.
 
 - **Test Case 4**: Invalid HTTP method
+
   - **Input**: HTTP GET request instead of POST
   - **Expected Output**: HTTP 405 Method Not Allowed
   - **Mock**: None needed, test checks for method validation.
 
 - **Test Case 5**: Invalid user ID format
+
   - **Input**: HTTP POST with header `userId=invalid`
   - **Expected Output**: HTTP 400 Bad Request with body `"Invalid userId header"`
   - **Mock**: None needed, test checks for user ID validation.
 
 - **Test Case 6**: Invalid phone format
+
   - **Input**: HTTP POST with header `userId=42` and JSON body `{"phone": "123"}`
   - **Expected Output**: HTTP 400 Bad Request with body `"Invalid phone format"`
   - **Mock**: None needed, test checks for phone validation.
 
 - **Test Case 7**: Database update error
+
   - **Input**: HTTP POST with header `userId=42` and JSON body `{"phone": "1234567890"}`
   - **Expected Output**: HTTP 500 Internal Server Error with body `"Database update failed: database error"`
   - **Mock**: Update function returns database error.
@@ -784,21 +823,25 @@ This document lists the unit tests(added for Sprint 4) for the backend of the ap
 **Purpose**: Retrieves a user's profile information including name, email, phone, and address.
 
 - **Test Case 1**: Successful profile retrieval with complete profile
+
   - **Input**: HTTP GET with header `userId=42`
   - **Expected Output**: HTTP 200 OK with JSON body containing name, email, phone, and address
   - **Mock**: GetUserInfo returns complete user information.
 
 - **Test Case 2**: Successful profile retrieval with partial profile (missing phone/address)
+
   - **Input**: HTTP GET with header `userId=42`
   - **Expected Output**: HTTP 200 OK with JSON body containing name, email, and empty phone/address
   - **Mock**: GetUserInfo returns user with empty phone and address.
 
 - **Test Case 3**: Invalid HTTP method
+
   - **Input**: HTTP POST request instead of GET
   - **Expected Output**: HTTP 405 Method Not Allowed
   - **Mock**: None needed, test checks for method validation.
 
 - **Test Case 4**: Invalid user ID format
+
   - **Input**: HTTP GET with header `userId=invalid`
   - **Expected Output**: HTTP 400 Bad Request with body `"Invalid userId header"`
   - **Mock**: None needed, test checks for user ID validation.

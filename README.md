@@ -21,6 +21,60 @@ UFMarketplace is a web-based platform exclusively designed for the University of
 
 # Steps to intsall and run
 
+## Frontend
+
+### Prerequisites
+
+- **Node.js and npm:** Make sure Node.js and npm are installed. Download the latest LTS version from [https://nodejs.org/en/download](https://nodejs.org/en/download).
+
+### Install and Run the Frontend
+
+1. **Navigate to the Frontend directory:**
+
+   ```bash
+   cd UFMarketPlace/Frontend
+   ```
+
+2. **Install the dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+3. **Start the React development server:**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser and go to:**
+   ```
+   http://localhost:5173
+   ```
+
+### Running Test Cases
+
+- **Unit Tests:** To run the unit tests, use the following command:
+
+  ```bash
+  npm test
+  ```
+
+- **Cypress Tests:** For end-to-end testing with Cypress:
+  - Ensure both the frontend and backend applications are running.
+  - Open the Cypress test runner with:
+    ```bash
+    npx cypress open
+    ```
+
+### Notes
+
+- The frontend is built using React and Vite.
+- Make sure the backend server is running before using the frontend. It is expected to be available at `http://localhost:8080`.
+- If your backend is on a different URL or port, update the API base URL in the frontend code.
+
+---
+
 ## Backend
 
 ---
