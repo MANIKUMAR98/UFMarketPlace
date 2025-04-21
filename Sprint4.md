@@ -615,7 +615,7 @@ Deletes an existing user based on the `userId` provided in the request header.
 
 ---
 
-### **User Profile**
+# **User Profile**
 
 These APIs help in adding and getting of address and phone number of the user
 
