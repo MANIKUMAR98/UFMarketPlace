@@ -615,7 +615,7 @@ Deletes an existing user based on the `userId` provided in the request header.
 
 ---
 
-## **User Profile**
+### **User Profile**
 
 These APIs help in adding and getting of address and phone number of the user
 
@@ -623,12 +623,12 @@ These APIs help in adding and getting of address and phone number of the user
 
 `POST /updateUserProfile`
 
-### **Request Headers**
+## **Request Headers**
 
 - `userId` (required): The ID of the user to be deleted.
 - `X-Session-ID` (required): Valid session ID for the user
 
-### **Request Body**
+## **Request Body**
 
 ```json
 {
@@ -637,7 +637,7 @@ These APIs help in adding and getting of address and phone number of the user
 }
 ```
 
-### **Success Response (JSON)**
+## **Success Response (JSON)**
 
 ```json
 {
@@ -645,13 +645,14 @@ These APIs help in adding and getting of address and phone number of the user
 }
 ```
 
-### **Response Errors**
+## Response Errors
 
-Status Code | Error Type | Example Response Body
-400 | Invalid Request | "Invalid userId header", "Invalid JSON", "At least one of phone or address must be provided", "Invalid phone format"
-401 | Unauthorized | "Session expired", "Invalid credentials"
-404 | Not Found | "User not found"
-405 | Method Not Allowed | "Method Not Allowed"
-500 | Internal Server Error | "Database update failed: ...", "Error getting user details"
+| Status Code | Error Type            | Example Response Body                                                                                                        |
+| ----------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| 400         | Invalid Request       | `"Invalid userId header"`, `"Invalid JSON"`, `"At least one of phone or address must be provided"`, `"Invalid phone format"` |
+| 401         | Unauthorized          | `"Session expired"`, `"Invalid credentials"`                                                                                 |
+| 404         | Not Found             | `"User not found"`                                                                                                           |
+| 405         | Method Not Allowed    | `"Method Not Allowed"`                                                                                                       |
+| 500         | Internal Server Error | `"Database update failed: ..."`, `"Error getting user details"`                                                              |
 
 ---
