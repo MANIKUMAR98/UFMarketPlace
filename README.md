@@ -135,6 +135,11 @@ git clone https://github.com/MANIKUMAR98/UFMarketPlace.git
 cd UFMarketPlace
 ```
 
+## Add config file
+
+1. Setup a twilio SendGrid accound and creat an Email API service
+2. Reffer the template_config.json and create config.json file in Backend Folder
+
 ## Build and Run the Application
 
 1. Navigate to the backend directory:
