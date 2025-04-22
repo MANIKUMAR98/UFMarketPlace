@@ -875,7 +875,9 @@ These APIs help in adding and getting of address and phone number of the user
 
 ```json
 {
-  "message": "User deleted successfully"
+  "message": "Profile updated successfully",
+  "address": "SW 3000",
+  "phone": "1234567891"
 }
 ```
 
