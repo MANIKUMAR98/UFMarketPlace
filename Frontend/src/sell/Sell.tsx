@@ -59,7 +59,11 @@ const Sell: React.FC = () => {
     const fetchListings = async () => {
       try {
         const savedProducts = await authService.getListing();
-        if (savedProducts) {
+        console.log(savedProducts);
+        if (savedProducts.length == 0) {
+          return;
+        }
+        if (savedProducts.length > 0) {
           const updatedProducts: Product[] = savedProducts.map((prod) => ({
             id: String(prod.id),
             name: prod.productName,

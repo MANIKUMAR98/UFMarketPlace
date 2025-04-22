@@ -30,6 +30,10 @@
 | #317  | Responsive profile fields        | Mobile styles in ProfileForm.module.css   |
 | #318  | Profile update tests             | Jest tests for phone/address persistence  |
 
+---
+
+# Cypress Test
+
 ## Cypress Authentication Tests (`authentication.cy.ts`)
 
 ### Overview
@@ -63,119 +67,323 @@ The `authentication.cy.ts` file contains end-to-end tests for the authentication
 
 ## Cypress Footer Tests (`footer.cy.js`)
 
-### Overview
+## Overview
 
-The `footer.cy.js` file contains end-to-end tests for the `Footer` component of the UFMarketPlace application. These tests ensure that the footer renders correctly, contains all necessary static content, and links function as expected.
+This document describes the Cypress test suite for the Footer component that appears across the application.
 
----
+## Test Suite Structure
 
-### Test Cases
+### File Location
 
-1. **Rendering Static Content**
+`cypress/e2e/footer.cy.js`
 
-   - Verifies that the footer displays the correct copyright text.
-   - Ensures that the Privacy Policy and Terms of Service links are present.
+### Prerequisites
 
-2. **Social Media Links**
+- Node.js installed
+- Cypress installed
+- Application running on `http://localhost:5173`
+- Valid user credentials
 
-   - Verifies that the social media icons (Facebook, Twitter, Instagram) are rendered.
-   - Ensures that the social media links point to the correct URLs.
+## Test Cases
 
-3. **Accessibility**
+### 1. Authentication and Navigation
 
-   - Ensures that social media icons have appropriate `aria-label` attributes for screen readers.
+**Description**: Sets up authenticated state for footer testing  
+**Steps**:
 
-4. **Link Behavior**
-   - Verifies that social media links open in a new tab.
-   - Ensures that the links include the `rel="noopener noreferrer"` attribute for security.
+1. Visits login page
+2. Enters valid credentials (email/password)
+3. Submits the form
+4. Verifies dashboard redirection
+5. Navigates to dashboard page
 
----
+**Assertions**:
 
-### Key Features
+- URL contains '/dashboard' after login
+- Successfully loads dashboard page with footer
 
-- **Static Content Validation**:
-  - Ensures that all static text and links are rendered correctly.
-- **Link Validation**:
-  - Verifies that links point to the correct destinations and open securely.
-- **Accessibility Compliance**:
-  - Ensures that the footer is accessible to users with assistive technologies.
+### 2. Footer Rendering Test
+
+**Description**: Verifies basic footer existence and copyright text  
+**Assertions**:
+
+- Footer element exists with correct class
+- Copyright text appears with current year and correct format
+
+### 3. Policy Links Verification
+
+**Description**: Tests presence and content of policy links  
+**Assertions**:
+
+- Privacy Policy link exists with correct text and href
+- Terms of Service link exists with correct text and href
+
+### 4. Policy Links Functionality
+
+**Description**: Tests navigation of policy links  
+**Actions**:
+
+- Clicks Privacy Policy link
+- Verifies navigation
+- Returns to dashboard
+- Clicks Terms of Service link
+- Verifies navigation
+
+**Assertions**:
+
+- URL updates correctly for each policy page
+- Back navigation works properly
+
+### 5. Social Media Icons Test
+
+**Description**: Verifies all social media links and icons  
+**Assertions**:
+
+- Social icons container exists
+- Correct number of social links (3)
+- Each platform link has:
+  - Correct aria-label
+  - Proper href attribute
+  - Security attributes (target=\_blank, rel=noopener noreferrer)
+
+### 6. Icon Implementation Test
+
+**Description**: Verifies Font Awesome classes are applied correctly  
+**Assertions**:
+
+- Facebook icon has correct FA class
+- Twitter icon has correct FA class
+- Instagram icon has correct FA class
+
+## Test Data
+
+**Credentials used**:
+
+- Email: `manikuma.honnena@ufl.edu`
+- Password: `12345678`
+
+**Expected Social Links**:
+| Platform | URL | Icon Class |
+|-------------|-------------------------|------------------|
+| Facebook | https://facebook.com | fa-facebook |
+| Twitter | https://twitter.com | fa-twitter |
+| Instagram | https://instagram.com | fa-instagram |
 
 ---
 
 ## Cypress Forgot Password Tests (`forgotPassword.cy.js`)
 
-### Overview
+## Overview
 
-The `forgotPassword.cy.js` file contains end-to-end tests for the "Forgot Password" functionality of the UFMarketPlace application. These tests ensure that users can reset their passwords securely and that the process handles errors gracefully.
+This document describes the Cypress test suite for the Forgot Password functionality, covering email validation, OTP flow, and password reset scenarios.
 
----
+## Test Suite Structure
 
-### Test Cases
+### File Location
 
-1. **Invalid Email Format**
+`cypress/e2e/forgotPassword.cy.js`
 
-   - Verifies that an error message is displayed when a non-UF email is entered.
-   - Ensures that only valid UF email addresses are accepted.
+### Test Flow
 
-2. **Send OTP**
+1. Access Forgot Password page
+2. Test email validation
+3. Test OTP sending
+4. Test password reset scenarios
 
-   - Tests the functionality of sending an OTP to a valid email address.
-   - Verifies that a success message is displayed after the OTP is sent.
+## Test Cases
 
-3. **Invalid OTP**
+### 1. Email Validation
 
-   - Verifies that an error message is displayed when an incorrect OTP is entered.
+**Description**: Verifies UF email validation  
+**Steps**:
 
-4. **Password Reset**
+1. Enters non-UF email (test@gmail.com)
+2. Clicks "Send OTP"
 
-   - Tests the complete password reset flow with a valid OTP and new password.
-   - Ensures that the user can log in with the new password after resetting it.
+**Assertions**:
 
-5. **Password Mismatch**
-   - Verifies that an error message is displayed when the "New Password" and "Confirm New Password" fields do not match.
+- Displays "Only UF emails are allowed" error
+- Prevents OTP sending
 
----
+### 2. OTP Sending Flow
 
-### Key Features
+**Description**: Tests successful OTP request  
+**Steps**:
 
-- **Email Validation**:
-  - Ensures that only valid UF email addresses are accepted.
-- **OTP Handling**:
-  - Verifies that OTPs are sent and validated correctly.
-- **Password Reset Flow**:
-  - Ensures that users can reset their passwords securely.
-- **Error Handling**:
-  - Tests the display of error messages for invalid inputs.
+1. Enters valid UF email
+2. Clicks "Send OTP"
+
+**Assertions**:
+
+- Displays success message
+- Transitions to OTP input view
+- Shows OTP input field after delay
+
+### 3. Password Mismatch
+
+**Description**: Tests password confirmation validation  
+**Steps**:
+
+1. Completes OTP flow
+2. Enters mismatched passwords
+3. Clicks "Reset Password"
+
+**Assertions**:
+
+- Displays "Passwords do not match" error
+- Prevents password reset
+
+### 4. Successful Password Reset
+
+**Description**: Tests complete happy path  
+**Mock Endpoints**:
+
+- `POST /sendEmailVerificationCode` (200 success)
+- `POST /resetPassword` (200 success)
+
+**Steps**:
+
+1. Enters UF email
+2. Sends OTP
+3. Enters matching OTP
+4. Sets new password
+5. Confirms password
+6. Submits form
+
+**Assertions**:
+
+- Shows success message
+- Completes API calls successfully
+
+### 5. Failed Password Reset
+
+**Description**: Tests error handling  
+**Steps**:
+
+1. Completes OTP flow
+2. Enters matching passwords
+3. Submits form
+
+**Assertions**:
+
+- Displays failure message
+- Handles API errors gracefully
+
+## Test Data
+
+**Valid Test Credentials**:
+
+- UF Email: `manikuma.honnena@ufl.edu`
+- OTP: `123456`
+- New Password: `password123`
+
+**API Mocks**:
+
+```javascript
+{
+  // OTP Send
+  "POST /sendEmailVerificationCode": {
+    status: 200,
+    body: { success: true }
+  },
+
+  // Password Reset
+  "POST /resetPassword": {
+    status: 200,
+    body: { success: true }
+  }
+}
+```
 
 ---
 
 ## Cypress Sell Page Tests (`sell.cy.js`)
 
-### Overview
+## Overview
 
-The `sell.cy.js` file contains end-to-end tests for the "Sell" page of the UFMarketPlace application. These tests ensure that users can list products for sale, validate form inputs, and interact with the page elements as expected.
+This document describes the Cypress test suite for the Sell component, which handles product listings in the application.
 
----
+## Test Suite Structure
 
-### Test Cases
+### File Location
 
-1. **Rendering Static Components**
+`cypress/e2e/sell.cy.js`
 
-   - Verifies that the "Sell Your Product" heading is displayed.
-   - Ensures that all input fields, dropdowns, and buttons are visible.
+## Test Cases
 
-2. **Form Validation**
+### 1. Authentication and Navigation
 
-   - Tests that required fields (e.g., product name, description, price) cannot be left empty.
-   - Verifies that appropriate error messages are displayed for invalid inputs.
+**Description**: Verifies successful login and navigation to listings page  
+**Steps**:
 
-3. **Successful Product Submission**
+1. Visits login page
+2. Enters valid credentials
+3. Submits the form
+4. Verifies redirection to dashboard
+5. Navigates to listings page
 
-   - Tests the complete flow of filling out the form and submitting a product.
-   - Verifies that a success message is displayed after submission.
+**Assertions**:
 
-4. **Cancel Button**
-   - Verifies that clicking the "Cancel" button redirects the user back to the dashboard.
+- URL contains '/dashboard' after login
+- Successfully reaches listings page
+
+### 2. Empty Listings State
+
+**Description**: Tests the component behavior when no products exist  
+**Mock**: Returns empty array for listings  
+**Assertions**:
+
+- "My Listings" header exists
+- Empty state message appears
+- "Add Listing" button is visible
+
+### 3. Listing Modal Interaction
+
+**Description**: Tests the create listing modal functionality  
+**Actions**:
+
+- Opens create listing modal
+- Verifies all form fields
+- Closes modal
+
+**Assertions**:
+
+- Modal becomes visible
+- All form fields are present
+- Modal closes properly
+
+### 4. Listing Creation
+
+**Description**: Tests creating a new product listing  
+**Mock**: Successful POST response with test product  
+**Actions**:
+
+- Opens create form
+- Fills out all fields
+- Submits the form
+
+**Assertions**:
+
+- New listing appears in the list
+- All product details display correctly
+
+## Test Data
+
+**Credentials used**:
+
+- Email: `manikuma.honnena@ufl.edu`
+- Password: `12345678`
+
+**Test Product**:
+
+```json
+{
+  "productName": "Test Product",
+  "productDescription": "Test Description",
+  "price": 19.99,
+  "category": "Electronics"
+}
+```
 
 ---
 
